@@ -2,18 +2,18 @@
     "collab_server" : "",
     "contents" : "",
     "created" : 1575930924588.000,
-    "dirty" : true,
+    "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "0",
     "id" : "E8F67AE6",
-    "lastKnownWriteTime" : 1575931163,
-    "last_content_update" : 1575931221983,
+    "lastKnownWriteTime" : 1575932625,
+    "last_content_update" : 1575932625207,
     "path" : "C:/Users/linds/Desktop/website/config.toml",
     "project_path" : "config.toml",
     "properties" : {
-        "cursorPosition" : "24,27",
-        "scrollLine" : "12"
+        "cursorPosition" : "11,0",
+        "scrollLine" : "0"
     },
     "relative_order" : 3,
     "source_on_save" : false,

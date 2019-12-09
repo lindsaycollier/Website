@@ -11,7 +11,7 @@ theme = "hugo-sustain"
   post = "/:year/:month/:day/:slug"
 
 [params]
-  avatar = "profile.png"
+  avatar = "picresize.jpg"
   author = "Lindsay Collier"
   description = "Describe your website"
 
@@ -20,13 +20,9 @@ theme = "hugo-sustain"
   custom_js  = []
 
 [params.social]
-  Github        = "username"
-  Email         = "email@example.com"
-  Twitter       = "username"
-  LinkedIn      = "username"
-  Stackoverflow = "username"
-  Medium        = "username"
-  Telegram      = "username"
+  Github        = "lindsaycollier"
+  Email         = "lindsay.collier@utexas.edu"
+  LinkedIn      = "lindsay-collier"
 
 ## Main Menu
 [[menu.main]]
