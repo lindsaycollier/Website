@@ -1,0 +1,362 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "Lindsay Collier"
+date: "October 20, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, fig.width=8,tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+```{R, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(knitr)
+library(factoextra)
+
+billboard <- read.csv("C:/Users/linds/Documents/_SDS 348 Computational Biology/Project 1/billboard_spotify.csv")
+music <- read.csv("C:/Users/linds/Documents/_SDS 348 Computational Biology/Project 1/music_df.csv")
+```
+
+###Introduction
+
+For this project, I wanted to explore the musical attributes of the most popular songs from the past 55 years, defined here as songs that were included on Billboard's annual Top 100 lists. What makes these songs unique? What makes a 'popular' song popular? How have mainstream musical tastes evolved over the last half century?
+
+To conduct this analysis, I am using two datasets that list unique musical characteristics of the most popular songs from 1950 to 2017.
+
+The _billboard_ dataset couples songs included on the Billboard Year-End Hot 100 Singles lists from 1960 to 2017 with Spotify metrics quantifying specific audio features. This dataset includes the variables of song, artist, song rank, year, and decade, and well as numerical values (each quantified on a scale from 0 to 1) for the following audio metrics:
+
+* acousticness (measures whether a song uses mainly acoustic instruments)
+* danceability (measures the tempo, rhythm, and beat strength to quantify how 'danceable' a song is)
+* energy (measures intensity and activity of a song)
+* instrumentalness (measures if a song is primarily instrumental instead of sung)
+* explicit (reports whether a song contains explicit lyrics, quantified as 0 or 1)
+* popularity (how often and recently a song is streamed on Spotify)
+* speechiness (measures the presence of spoken words in a song)
+* valence (measures the musical 'positiveness' of a song)
+* tempo (beats per minute)
+* loudness (decibels)
+* duration (minutes)
+* words per second
+
+The _music_ dataset contains songs sourced from Billboard's Top 100 lists from 1950 to 2015. These songs were paired with number of metrics (obtained using Python scripts to analyze the songs' lyrics) describing a given song's sentiment as well as its readability. This dataset includes the variables of song, artist, artist gender, year, as well as numerical values for the following metrics:
+
+* positivity score (probability that the song has a positive connotation)
+* neutrality score (probability that the song has a neutral connotation)
+* negativity score (probability that the song has a negative connotation)
+* Gunning-Fog Index (estimates the years of education required to understand a given text)
+
+After analyzing this data, I expect to find that more popular songs will have high danceability, energy, and valence scores. I expect that, over time, popular songs have decreased in acousticness, and increased in danceability and energy.
+
+###Tidying
+
+The datasets chosen for this analysis were already tidy, so they were made 'untidy' using dplyr functions and tidied again. In addition to being tidied, several unnecessary variables were removed from each dataset to reduce their size.
+
+```{R}
+#Tidying 'billboard'
+billboard_untidy <- billboard %>% pivot_longer(4:14, names_to="song_metric", 
+    values_to="metric_value") %>% pivot_longer(4:7, names_to = "song_time_metric",
+    values_to = "time_value")
+
+billboard_tidy <- billboard_untidy %>% pivot_wider(names_from = "song_metric",
+    values_from = "metric_value") %>% pivot_wider(names_from = "song_time_metric",
+    values_from = "time_value")
+
+billboard <- billboard_tidy %>% select(rank,song, artist, year, everything()) %>% 
+  select(-uniq_ratio, -num_words, -num_uniq_words, -liveness)
+
+glimpse(billboard)
+
+#Tidying 'music'
+music_untidy <- music %>% pivot_longer(4:6, names_to = "song_feeling", 
+  values_to = "feeling_value") %>%   pivot_longer(4:12, names_to="song_metric",
+  values_to = "metric_value")
+  
+music_tidy <- music_untidy %>% pivot_wider(names_from = "song_feeling", 
+  values_from = "feeling_value") %>% pivot_wider(names_from="song_metric", 
+  values_from = "metric_value")
+
+music <- music_tidy %>% select(-year_bin,-cluster,-num_words, -num_lines, 
+   -num_dupes, -compound, -difficult_words, -num_syllables, -flesch_index, 
+   -f_k_grade)
+
+glimpse(music)
+
+```
+
+##Joining and Merging
+
+The two datasets were merged using a full_join() function. This join was chosen because I wanted to retain all of the original data from both datasets when merging. Any non-matching entries were then removed using na.omit().
+
+During the merge, several cases were dropped from both datasets. Originally, the _billboard_ dataset contained 5,566 observations, and the _music_ dataset contained 3,807 observations. After joining and removing "NA" entries, the final merged dataset contains 2,961 observations, meaning that 6,412 observations were dropped. 
+
+
+```{R}
+billboard_music <- full_join(billboard,music,by=c("song","artist","year")) %>% 
+  na.omit()
+
+glimpse(billboard_music) 
+```
+
+These dropped observations were due to inconsistencies between the datasets. Namely, _billboard_ covers songs from 1960 to 2017, and _music_ covers songs from 1950 to 2015, resulting in a final year range of 1960 to 2015 after merging (and losing 12 years of songs that were unique to one dataset or the other). Additionally, each dataset was sourced from different types of Billboard Hot 100 lists, and as a result, some songs that were included in _billboard_ were not in _music_, and vice versa. 
+
+These dropped observations should be noted, as the final merged dataset thus gives an incomplete picture of the most popular songs from each decade, which can compromise the following analysis.
+
+##Wrangling
+
+Given the large number of numerical variables in the final datasets, I will be reporting summary statistics for only a few: danceability, energy, acousticness, popularity, valence, and sentiment score.
+
+####Mean and standard deviations of four numeric variables grouped by decade
+
+```{R}
+summary_stats_decade <- billboard_music %>% group_by(decade) %>%
+  summarize(mean(danceability), sd(danceability), mean(energy), sd(energy),
+  mean(acousticness), sd(acousticness)) %>% 
+  round(2)
+
+kable(head(summary_stats_decade))
+
+summary_stats_decade2 <- billboard_music %>% group_by(decade) %>%
+  summarize(mean(valence), sd(valence)) %>% 
+  round(2)
+
+kable(head(summary_stats_decade2))
+```
+
+The complete summary statistics reporting mean and standard deviation for five numeric variables can be seen above. 
+
+Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 $\pm$ 0.15 in the 1960s to 0.64 $\pm$ 0.12 in the 2010s. The mean energy score increased from 0.49 $\pm$ 0.2 in the 1960s to 0.72 $\pm$ 0.16 in the 2010s.
+
+By contrast, the mean acousticness has decreased over time, from 0.53 $\pm$ 0.28 in the 1960s to 0.14 $\pm$ 0.19 in the 2010s. Mean valence has also decreased, though to a lesser degree, from 0.66 $\pm$ 0.23 in the 1960s to 0.53 $\pm$ 0.22 in the 2010s.
+
+####Song popularity
+
+```{R}
+#Most popular songs
+kable(head(billboard_music %>% group_by(decade) %>% filter(popularity==max(popularity)) %>%
+    select(decade, song, artist, popularity, danceability, energy, valence)))
+```
+
+In each decade, the most popular songs tend to vary in their danceability scores (with a range of 0.491 to 0.781, and a mean of 0.63 $\pm$ 0.10) and their energy scores (with a range of 0.379 to 0.902, and a mean of 0.56 $\pm$ 0.22). 
+
+However, popular songs tend to have slightly higher valence -- the average valence of these seven most popular songs is 0.67 $\pm$ 0.28, higher than the dataset average of 0.59 $\pm$ 0.24. 
+
+```{R}
+#Least popular songs
+kable(billboard_music %>% arrange(popularity) %>%
+        select(decade,song,artist,popularity,danceability,energy) %>% 
+        head(n=10))
+```
+
+The 10 least popular songs of the dataset don't differ much from the most popular songs in terms of their danceability and energy. The mean danceability of the least popular songs is 0.62 $\pm$ 0.15, and the mean energy is 0.63 $\pm$ 0.19. One commonality between the least popular songs is that they tend to be older: nine of the 10 least popular songs are from the 1960s.
+
+####Song sentiment
+
+```{R}
+billboard_music_sentiment <- billboard_music %>% 
+  mutate(sentiment = case_when(pos > neu & pos > neg ~ "positive", 
+                               neu > pos & neu > neg ~ "neutral", 
+                               neg > pos & neg > neu ~ "negative")) %>%
+  select(song,artist,year,sentiment)
+
+kable(head(billboard_music_sentiment)) 
+
+billboard_music_sentiment %>% count(sentiment, sort = TRUE) %>% head()
+```
+
+Using mutate(), I generated a 'sentiment' variable that uses the pos, neg, and neu scores of each song to classify it as 'positive,' 'neutral,' or 'negative.' For instance, if a song's pos score is greater than its neu score and neg score, that song is classified as 'positive,' and so on. 
+
+Of the most popular songs from 1960 to 2015, 99.7% are 'neutral,' and 0.3% are 'positive.' No songs were classified as 'negative.'
+
+####Correlation
+
+```{R}
+billboard_music_num <- billboard_music %>% select_if(is.numeric) %>% 
+  select(-rank, -year, -words_per_sec, -speechiness, -explicit, -duration_min) %>% 
+  scale()
+
+billboard_cor <- cor(billboard_music_num) %>% round(2)
+
+get_upper_tri <- function(billboard_cor){
+  billboard_cor[lower.tri(billboard_cor)]<- NA
+  return(billboard_cor)
+}
+upper_tri <- get_upper_tri(billboard_cor)
+billboard_cor_melt <- melt(upper_tri, na.rm = TRUE)
+
+ggplot(data = billboard_cor_melt, aes(Var2, Var1, fill = value)) +
+  geom_tile(color = "white") + 
+  geom_text(aes(Var2, Var1, label = value), color = "black", size = 2.5) +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+                       name="Correlation") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, size = 10, vjust = 1, hjust = 1)) +
+  coord_fixed()
+
+```
+
+Looking at the correlation heatmap, there are a few noticeable correlations between the numeric variables:
+
+* Energy is moderately negatively correlated with acousticness (-0.61), and moderately positively correlated with loudness (0.72).
+* Danceability is moderately positively correlated with valence (0.5).
+* Decade is moderately negatively correlated with acousticness (-0.42), and moderately positively correlated with loudness (0.54) and popularity (0.52).
+
+
+##Visualizing
+
+```{R}
+decade_chr <- billboard_music %>% mutate(decade=as.character(decade)) 
+
+ggplot(decade_chr, aes(danceability, energy, color = decade)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Spectral") + 
+  ggtitle("Energy and Danceability by Decade") +   
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  xlab("Danceability") + ylab("Energy")
+```
+In the above plot, I visualized the correlation between a song's "energy" and "danceability," grouped by the decade in which it was included on the Billboard Top 100. "Energy" refers to the intensity of a song; high energy songs tend to be fast, loud, and dense. "Danceability" looks at a song's tempo, rhythm, and beat strength to determine its suitability for dancing.
+
+In general, energy and danceability seem to be weakly correlated -- songs tend to cluster at the top of the plot, suggesting that Billboard Top 100 songs are likely to be high energy, but are more varied in their danceability. There is a clearer relationship when decade is incorporated into the analysis. When grouping songs by decade, songs released more recently (between 1990 and 2015) consistently have high energy and moderate-to-high danceability. However, older songs (released before 1990) do not tend to cluster in any significant way, and vary widely in their danceability and energy.
+
+This suggests that older Billboard Top 100 songs (released prior to 1990) had more diverse musical elements. In the last 25 years, Billboard Top 100 songs have become more 'homogenous' -- popular songs tend to be high energy and easy to dance to. 
+
+
+```{R}
+ggplot(billboard_music) + 
+  geom_density(aes(year,energy, fill = "e"), 
+               stat="summary", fun.y="mean", alpha = 0.3) + 
+  geom_density(aes(year,valence, fill = "v"), 
+               stat="summary", fun.y="mean", alpha = 0.3) +
+  scale_fill_manual(name="Music Metric", 
+                    values = c("e" = "deeppink", "v" = "deepskyblue"), 
+                    labels = c("e" = "Energy", "v" = "Valence")) + 
+  theme_minimal() +
+  scale_x_continuous(breaks=c(1960,1965,1970,1975,1980,1985,1990,1995,
+                              2000,2005,2010,2015)) + 
+  xlab("Year") + ylab("Metric Score") + 
+  theme(axis.text.x=element_text(angle=60, hjust=1)) +
+  ggtitle("Energy and Valence by Decade") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+Over the past 55 years, there have been clear trends in popular songs' "energy" and "valence." Here, "valence" refers to the musical positiveness that a song conveys (whether a song is happy and cheerful). 
+
+In the 1960s, Billboard Top 100 songs had a mean valence that was larger than the mean energy, suggesting that popular songs of this era were "chill" -- cheerful but not intense or noisy. By the 2010s, however, this distribution had flipped. Billboard Top 100 songs of the past couple decades have a mean energy that is larger than the mean valence. This suggests that, as time progressed, popular songs have become sadder but more energetic. 
+
+
+```{R}
+decade_chr %>% 
+  filter(Gender %in% c("female","male")) %>%
+  ggplot(aes(x=decade, y=acousticness, fill=Gender)) +
+  stat_boxplot(geom = 'errorbar') +
+  geom_boxplot(outlier.shape = NA) +
+  ggtitle("Acousticness and Artist's Gender by Decade") +
+  xlab("Decade") + ylab("Acousticness") +
+  scale_fill_brewer(palette="Pastel1") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Lastly, I wanted to examine if an artist's gender influenced the musical elements of their songs. In the plot above, "acousticness" measures whether a song used primarily acoustic or electronic instruments, with a large score correlating to a highly acoustic song. 
+
+In general, acousticness has declined greatly over time. Billboard Top 100 songs of the last 15 years or so have low mean acousticness scores, indicating a shift towards primarily electronic music. While acousticness overall has been on the decline, from 1960 to 1999 female singers tended to have higher acousticness scores than male singers. Beginning in 2000, however, there is no significant difference in acousticness scores on the basis of gender, as both male and female artists are consistently non-acoustic.
+
+##Dimensionality Reduction
+
+I conducted Principal Component Analysis on this dataset, focusing on four numeric variables: danceability, energy, acousticness, and valence. 
+
+####Preparing the data and computing PCA
+
+Before beginning PCA, the chosen numeric variables were normalized using scale(). PCA was conducted using princomp().
+
+```{R}
+#Preparing the data
+bm_num <- billboard_music %>% 
+  select(danceability,energy,acousticness,valence) %>% 
+  scale
+rownames(bm_num) <- billboard_music$song
+
+#Computing principal analysis components
+bm_pca <- princomp(bm_num)
+summary(bm_pca,loadings=T)
+```
+
+####Choosing principal components
+
+The proportional variance for each principal component was computed by first squaring the standard deviation outputs, and then dividing each variance by the total variance. To visualize the proportional variance of each principal component, a Scree plot was generated.
+
+```{R}
+eigval <- bm_pca$sdev^2 
+varprop = round(eigval/sum(eigval), 2) 
+
+ggplot()+geom_bar(aes(y=varprop,x=1:4),stat="identity") + xlab("") +
+  geom_path(aes(y=varprop,x=1:4)) + 
+  geom_text(aes(x=1:4,y=varprop,label=round(varprop,2)),vjust=1,col="white",size=5) +
+  scale_y_continuous(breaks=seq(0,.6,.2),labels = scales::percent) +
+  scale_x_continuous(breaks=1:10) + 
+  xlab("Principal Component") + 
+  ylab("Proportion of Variance") +
+  ggtitle("Scree Plot") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+The Scree plot above shows the proportion of variance explained by each principal component. Principal component 1 (PC1) and principal component 2 (PC2) together explain 77.83% of the variance in the dataset. This is close to 80%, and thus PC1 and PC2 should be sufficient for this analysis.
+
+###Visualizing and interpreting principal components 
+
+First, the PC scores for each observation were plotted in a scatterplot. Then, the loadings for each principal component were plotted to visualize their relationships with each other.
+
+```{R}
+#Plotting PC1 vs. PC2
+ggplot()+geom_point(aes(bm_pca$scores[,1], bm_pca$scores[,2])) + 
+  xlab("PC1") + ylab("PC2")
+
+#Loadings plot
+bm_pca$loadings[1:4,1:2] %>% as.data.frame %>% rownames_to_column %>% 
+  ggplot()+geom_hline(aes(yintercept=0),lty=2) +
+  geom_vline(aes(xintercept=0),lty=2) + ylab("PC2") + xlab("PC1") +
+  geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col="red") +
+  geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname, hjust=0.33))
+```
+
+PC1 correlates positively with danceability, energy, and valence, and correlates negatively with acousticness. PC1 can thus be interpreted as a general 'liveliness' score. Songs with a large PC1 score tend to be primarily electronic, cheerful, energetic, and easy to dance to. Songs with a low PC2 score tend to be acoustic, sad, and low energy with a slow tempo.
+
+PC2 correlates positively with danceability, acousticness, and valence, and correlates negatively with energy. PC2 can be interpreted as a 'mood' score. Songs with a large PC2 score tend to be acoustic, low energy, have good beats and rhythm, and be cheerful. Conversely, songs with low PC2 scores tend to convey negativity, and be electronic, intense, and hard to dance to. 
+
+When plotting PC1 versus PC2, there are no clear clusters formed, though there seems to be a larger density of points with large PC1 scores, suggesting that popular songs tend to be lively.
+
+When examining the loadings plot of PC1 and PC2, it can be seen that danceability and valence are correlated (cheerful songs tend to have good rhythm, tempo, and beat strength). However, there are no  strong positive correlations between any of the other variables, though acousticness appears to be negatively correlated with danceability, energy, and valence.
+
+####Computing PC scores for notable observations
+
+```{R}
+Name<-(billboard_music$song)
+
+#PC 1: 
+bm_pca$scores%>%as.data.frame%>%cbind(Name,.)%>%top_n(3,Comp.1) 
+billboard_music%>%filter(Name%in%c("i've got to use my imagination",
+                                   "wanna be startin' somethin'",
+                                   "move this")) %>%
+  select(song,artist,acousticness,danceability,energy,valence)
+
+#PC 2:
+bm_pca$scores%>%as.data.frame%>%cbind(Name,.)%>%top_n(3,wt=Comp.2) 
+billboard_music%>%filter(Name%in%c("sweet nothin's",
+                                   "just one look",
+                                   "motorcycle mama")) %>%
+    select(song,artist,acousticness,danceability,energy,valence)
+```
+
+The three songs with the highest PC1 scores are "I've Got to Use My Imagination" by Gladys Knight and the Pips, "Wanna be Startin' Somethin'" by Michael Jackson, and "Move This" by Technotronic. These are the 'liveliest' songs in the dataset: they have high danceability, energy, and valence, and low acousticness.
+
+The three songs with the highest PC2 scores are "Sweet Nothin's" by Brenda Lee, "Just One Look" by Doris Troy, and "Motorcycle Mama" by Sailcat. These are the most 'relaxed and cheerful' songs in the dataset: they have high acousticness, danceability, and valence, but low energy.
+

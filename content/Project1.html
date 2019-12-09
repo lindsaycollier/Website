@@ -1,0 +1,676 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "Lindsay Collier"
+date: "October 20, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>For this project, I wanted to explore the musical attributes of the most popular songs from the past 55 years, defined here as songs that were included on Billboard’s annual Top 100 lists. What makes these songs unique? What makes a ‘popular’ song popular? How have mainstream musical tastes evolved over the last half century?</p>
+<p>To conduct this analysis, I am using two datasets that list unique musical characteristics of the most popular songs from 1950 to 2017.</p>
+<p>The <em>billboard</em> dataset couples songs included on the Billboard Year-End Hot 100 Singles lists from 1960 to 2017 with Spotify metrics quantifying specific audio features. This dataset includes the variables of song, artist, song rank, year, and decade, and well as numerical values (each quantified on a scale from 0 to 1) for the following audio metrics:</p>
+<ul>
+<li>acousticness (measures whether a song uses mainly acoustic instruments)</li>
+<li>danceability (measures the tempo, rhythm, and beat strength to quantify how ‘danceable’ a song is)</li>
+<li>energy (measures intensity and activity of a song)</li>
+<li>instrumentalness (measures if a song is primarily instrumental instead of sung)</li>
+<li>explicit (reports whether a song contains explicit lyrics, quantified as 0 or 1)</li>
+<li>popularity (how often and recently a song is streamed on Spotify)</li>
+<li>speechiness (measures the presence of spoken words in a song)</li>
+<li>valence (measures the musical ‘positiveness’ of a song)</li>
+<li>tempo (beats per minute)</li>
+<li>loudness (decibels)</li>
+<li>duration (minutes)</li>
+<li>words per second</li>
+</ul>
+<p>The <em>music</em> dataset contains songs sourced from Billboard’s Top 100 lists from 1950 to 2015. These songs were paired with number of metrics (obtained using Python scripts to analyze the songs’ lyrics) describing a given song’s sentiment as well as its readability. This dataset includes the variables of song, artist, artist gender, year, as well as numerical values for the following metrics:</p>
+<ul>
+<li>positivity score (probability that the song has a positive connotation)</li>
+<li>neutrality score (probability that the song has a neutral connotation)</li>
+<li>negativity score (probability that the song has a negative connotation)</li>
+<li>Gunning-Fog Index (estimates the years of education required to understand a given text)</li>
+</ul>
+<p>After analyzing this data, I expect to find that more popular songs will have high danceability, energy, and valence scores. I expect that, over time, popular songs have decreased in acousticness, and increased in danceability and energy.</p>
+</div>
+<div id="tidying" class="section level3">
+<h3>Tidying</h3>
+<p>The datasets chosen for this analysis were already tidy, so they were made ‘untidy’ using dplyr functions and tidied again. In addition to being tidied, several unnecessary variables were removed from each dataset to reduce their size.</p>
+<pre class="r"><code># Tidying &#39;billboard&#39;
+billboard_untidy &lt;- billboard %&gt;% pivot_longer(4:14, names_to = &quot;song_metric&quot;, 
+    values_to = &quot;metric_value&quot;) %&gt;% pivot_longer(4:7, names_to = &quot;song_time_metric&quot;, 
+    values_to = &quot;time_value&quot;)
+
+billboard_tidy &lt;- billboard_untidy %&gt;% pivot_wider(names_from = &quot;song_metric&quot;, 
+    values_from = &quot;metric_value&quot;) %&gt;% pivot_wider(names_from = &quot;song_time_metric&quot;, 
+    values_from = &quot;time_value&quot;)
+
+billboard &lt;- billboard_tidy %&gt;% select(rank, song, artist, year, 
+    everything()) %&gt;% select(-uniq_ratio, -num_words, -num_uniq_words, 
+    -liveness)
+
+glimpse(billboard)</code></pre>
+<pre><code>## Observations: 5,566
+## Variables: 17
+## $ rank             &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
+## $ song             &lt;fct&gt; &quot;theme from a summer place&quot;, &quot;he&#39;ll have to g...
+## $ artist           &lt;fct&gt; percy faith, jim reeves, the everly brothers,...
+## $ year             &lt;dbl&gt; 1960, 1960, 1960, 1960, 1960, 1960, 1960, 196...
+## $ decade           &lt;int&gt; 1960, 1960, 1960, 1960, 1960, 1960, 1960, 196...
+## $ acousticness     &lt;dbl&gt; 0.631, 0.909, 0.412, 0.854, 0.936, 0.928, 0.6...
+## $ danceability     &lt;dbl&gt; 0.466, 0.554, 0.498, 0.772, 0.570, 0.529, 0.6...
+## $ energy           &lt;dbl&gt; 0.3890, 0.1860, 0.5820, 0.2970, 0.0636, 0.115...
+## $ explicit         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ instrumentalness &lt;dbl&gt; 8.43e-01, 1.44e-03, 0.00e+00, 7.59e-06, 0.00e...
+## $ loudness         &lt;dbl&gt; -12.825, -15.846, -8.961, -14.679, -18.548, -...
+## $ popularity       &lt;dbl&gt; 49, 53, 50, 40, 18, 48, 58, 28, 59, 52, 37, 2...
+## $ speechiness      &lt;dbl&gt; 0.0253, 0.0379, 0.0339, 0.0530, 0.0459, 0.030...
+## $ tempo            &lt;dbl&gt; 92.631, 81.181, 119.809, 119.987, 101.517, 10...
+## $ valence          &lt;dbl&gt; 0.749, 0.200, 0.866, 0.822, 0.282, 0.339, 0.7...
+## $ duration_min     &lt;dbl&gt; 2.414883, 2.310667, 2.400217, 2.636667, 2.664...
+## $ words_per_sec    &lt;dbl&gt; 0.7177710, 1.0963647, 0.8402019, 1.3906448, 0...</code></pre>
+<pre class="r"><code># Tidying &#39;music&#39;
+music_untidy &lt;- music %&gt;% pivot_longer(4:6, names_to = &quot;song_feeling&quot;, 
+    values_to = &quot;feeling_value&quot;) %&gt;% pivot_longer(4:12, names_to = &quot;song_metric&quot;, 
+    values_to = &quot;metric_value&quot;)
+
+music_tidy &lt;- music_untidy %&gt;% pivot_wider(names_from = &quot;song_feeling&quot;, 
+    values_from = &quot;feeling_value&quot;) %&gt;% pivot_wider(names_from = &quot;song_metric&quot;, 
+    values_from = &quot;metric_value&quot;)
+
+music &lt;- music_tidy %&gt;% select(-year_bin, -cluster, -num_words, 
+    -num_lines, -num_dupes, -compound, -difficult_words, -num_syllables, 
+    -flesch_index, -f_k_grade)
+
+glimpse(music)</code></pre>
+<pre><code>## Observations: 3,807
+## Variables: 8
+## $ song      &lt;fct&gt; he&#39;ll have to go, cathy&#39;s clown, i&#39;m sorry, it&#39;s now...
+## $ artist    &lt;fct&gt; jim reeves, everly brothers, brenda lee, elvis presl...
+## $ year      &lt;int&gt; 1960, 1960, 1960, 1960, 1960, 1960, 1960, 1960, 1960...
+## $ Gender    &lt;fct&gt; male, Group, female, male, male, male, female, male,...
+## $ pos       &lt;dbl&gt; 0.186, 0.056, 0.204, 0.163, 0.213, 0.101, 0.111, 0.0...
+## $ neg       &lt;dbl&gt; 0.091, 0.281, 0.264, 0.141, 0.122, 0.079, 0.246, 0.0...
+## $ neu       &lt;dbl&gt; 0.723, 0.663, 0.532, 0.696, 0.664, 0.821, 0.643, 0.9...
+## $ fog_index &lt;dbl&gt; 5.2, 3.6, 3.6, 4.8, 4.8, 4.0, 4.4, 5.6, 5.2, 4.0, 4....</code></pre>
+</div>
+<div id="joining-and-merging" class="section level2">
+<h2>Joining and Merging</h2>
+<p>The two datasets were merged using a full_join() function. This join was chosen because I wanted to retain all of the original data from both datasets when merging. Any non-matching entries were then removed using na.omit().</p>
+<p>During the merge, several cases were dropped from both datasets. Originally, the <em>billboard</em> dataset contained 5,566 observations, and the <em>music</em> dataset contained 3,807 observations. After joining and removing “NA” entries, the final merged dataset contains 2,961 observations, meaning that 6,412 observations were dropped.</p>
+<pre class="r"><code>billboard_music &lt;- full_join(billboard, music, by = c(&quot;song&quot;, 
+    &quot;artist&quot;, &quot;year&quot;)) %&gt;% na.omit()</code></pre>
+<pre><code>## Warning: Column `song` joining factors with different levels, coercing to
+## character vector</code></pre>
+<pre><code>## Warning: Column `artist` joining factors with different levels, coercing to
+## character vector</code></pre>
+<pre class="r"><code>glimpse(billboard_music)</code></pre>
+<pre><code>## Observations: 2,961
+## Variables: 22
+## $ rank             &lt;int&gt; 2, 6, 7, 9, 10, 11, 12, 15, 17, 18, 20, 23, 2...
+## $ song             &lt;chr&gt; &quot;he&#39;ll have to go&quot;, &quot;i&#39;m sorry&quot;, &quot;it&#39;s now or...
+## $ artist           &lt;chr&gt; &quot;jim reeves&quot;, &quot;brenda lee&quot;, &quot;elvis presley&quot;, ...
+## $ year             &lt;dbl&gt; 1960, 1960, 1960, 1960, 1960, 1960, 1960, 196...
+## $ decade           &lt;int&gt; 1960, 1960, 1960, 1960, 1960, 1960, 1960, 196...
+## $ acousticness     &lt;dbl&gt; 0.909, 0.928, 0.642, 0.758, 0.199, 0.826, 0.7...
+## $ danceability     &lt;dbl&gt; 0.554, 0.529, 0.643, 0.647, 0.526, 0.589, 0.5...
+## $ energy           &lt;dbl&gt; 0.186, 0.115, 0.491, 0.513, 0.633, 0.643, 0.7...
+## $ explicit         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ instrumentalness &lt;dbl&gt; 1.44e-03, 3.33e-03, 9.72e-03, 8.64e-06, 1.24e...
+## $ loudness         &lt;dbl&gt; -15.846, -16.284, -9.312, -12.372, -7.119, -8...
+## $ popularity       &lt;dbl&gt; 53, 48, 58, 59, 52, 37, 24, 58, 19, 37, 60, 4...
+## $ speechiness      &lt;dbl&gt; 0.0379, 0.0302, 0.0344, 0.0421, 0.0322, 0.030...
+## $ tempo            &lt;dbl&gt; 81.181, 101.501, 126.399, 131.641, 156.405, 8...
+## $ valence          &lt;dbl&gt; 0.200, 0.339, 0.753, 0.955, 0.953, 0.781, 0.8...
+## $ duration_min     &lt;dbl&gt; 2.310667, 2.669550, 3.243333, 2.327333, 2.562...
+## $ words_per_sec    &lt;dbl&gt; 1.0963647, 0.7117304, 0.9198356, 1.0670295, 0...
+## $ Gender           &lt;fct&gt; male, female, male, male, male, female, male,...
+## $ pos              &lt;dbl&gt; 0.186, 0.204, 0.163, 0.213, 0.101, 0.111, 0.0...
+## $ neg              &lt;dbl&gt; 0.091, 0.264, 0.141, 0.122, 0.079, 0.246, 0.0...
+## $ neu              &lt;dbl&gt; 0.723, 0.532, 0.696, 0.664, 0.821, 0.643, 0.9...
+## $ fog_index        &lt;dbl&gt; 5.2, 3.6, 4.8, 4.8, 4.0, 4.4, 5.6, 5.2, 4.0, ...</code></pre>
+<p>These dropped observations were due to inconsistencies between the datasets. Namely, <em>billboard</em> covers songs from 1960 to 2017, and <em>music</em> covers songs from 1950 to 2015, resulting in a final year range of 1960 to 2015 after merging (and losing 12 years of songs that were unique to one dataset or the other). Additionally, each dataset was sourced from different types of Billboard Hot 100 lists, and as a result, some songs that were included in <em>billboard</em> were not in <em>music</em>, and vice versa.</p>
+<p>These dropped observations should be noted, as the final merged dataset thus gives an incomplete picture of the most popular songs from each decade, which can compromise the following analysis.</p>
+</div>
+<div id="wrangling" class="section level2">
+<h2>Wrangling</h2>
+<p>Given the large number of numerical variables in the final datasets, I will be reporting summary statistics for only a few: danceability, energy, acousticness, popularity, valence, and sentiment score.</p>
+<div id="mean-and-standard-deviations-of-four-numeric-variables-grouped-by-decade" class="section level4">
+<h4>Mean and standard deviations of four numeric variables grouped by decade</h4>
+<pre class="r"><code>summary_stats_decade &lt;- billboard_music %&gt;% group_by(decade) %&gt;% 
+    summarize(mean(danceability), sd(danceability), mean(energy), 
+        sd(energy), mean(acousticness), sd(acousticness)) %&gt;% 
+    round(2)
+
+kable(head(summary_stats_decade))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">decade</th>
+<th align="right">mean(danceability)</th>
+<th align="right">sd(danceability)</th>
+<th align="right">mean(energy)</th>
+<th align="right">sd(energy)</th>
+<th align="right">mean(acousticness)</th>
+<th align="right">sd(acousticness)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="right">0.55</td>
+<td align="right">0.15</td>
+<td align="right">0.49</td>
+<td align="right">0.20</td>
+<td align="right">0.53</td>
+<td align="right">0.28</td>
+</tr>
+<tr class="even">
+<td align="right">1970</td>
+<td align="right">0.59</td>
+<td align="right">0.15</td>
+<td align="right">0.57</td>
+<td align="right">0.20</td>
+<td align="right">0.34</td>
+<td align="right">0.26</td>
+</tr>
+<tr class="odd">
+<td align="right">1980</td>
+<td align="right">0.63</td>
+<td align="right">0.15</td>
+<td align="right">0.63</td>
+<td align="right">0.20</td>
+<td align="right">0.24</td>
+<td align="right">0.23</td>
+</tr>
+<tr class="even">
+<td align="right">1990</td>
+<td align="right">0.64</td>
+<td align="right">0.15</td>
+<td align="right">0.63</td>
+<td align="right">0.18</td>
+<td align="right">0.21</td>
+<td align="right">0.22</td>
+</tr>
+<tr class="odd">
+<td align="right">2000</td>
+<td align="right">0.65</td>
+<td align="right">0.15</td>
+<td align="right">0.70</td>
+<td align="right">0.15</td>
+<td align="right">0.15</td>
+<td align="right">0.19</td>
+</tr>
+<tr class="even">
+<td align="right">2010</td>
+<td align="right">0.64</td>
+<td align="right">0.12</td>
+<td align="right">0.72</td>
+<td align="right">0.16</td>
+<td align="right">0.14</td>
+<td align="right">0.19</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>summary_stats_decade2 &lt;- billboard_music %&gt;% group_by(decade) %&gt;% 
+    summarize(mean(valence), sd(valence)) %&gt;% round(2)
+
+kable(head(summary_stats_decade2))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">decade</th>
+<th align="right">mean(valence)</th>
+<th align="right">sd(valence)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="right">0.66</td>
+<td align="right">0.23</td>
+</tr>
+<tr class="even">
+<td align="right">1970</td>
+<td align="right">0.65</td>
+<td align="right">0.24</td>
+</tr>
+<tr class="odd">
+<td align="right">1980</td>
+<td align="right">0.62</td>
+<td align="right">0.25</td>
+</tr>
+<tr class="even">
+<td align="right">1990</td>
+<td align="right">0.56</td>
+<td align="right">0.24</td>
+</tr>
+<tr class="odd">
+<td align="right">2000</td>
+<td align="right">0.57</td>
+<td align="right">0.23</td>
+</tr>
+<tr class="even">
+<td align="right">2010</td>
+<td align="right">0.53</td>
+<td align="right">0.22</td>
+</tr>
+</tbody>
+</table>
+<p>The complete summary statistics reporting mean and standard deviation for five numeric variables can be seen above.</p>
+<p>Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 <span class="math inline">\(\pm\)</span> 0.15 in the 1960s to 0.64 <span class="math inline">\(\pm\)</span> 0.12 in the 2010s. The mean energy score increased from 0.49 <span class="math inline">\(\pm\)</span> 0.2 in the 1960s to 0.72 <span class="math inline">\(\pm\)</span> 0.16 in the 2010s.</p>
+<p>By contrast, the mean acousticness has decreased over time, from 0.53 <span class="math inline">\(\pm\)</span> 0.28 in the 1960s to 0.14 <span class="math inline">\(\pm\)</span> 0.19 in the 2010s. Mean valence has also decreased, though to a lesser degree, from 0.66 <span class="math inline">\(\pm\)</span> 0.23 in the 1960s to 0.53 <span class="math inline">\(\pm\)</span> 0.22 in the 2010s.</p>
+</div>
+<div id="song-popularity" class="section level4">
+<h4>Song popularity</h4>
+<pre class="r"><code># Most popular songs
+kable(head(billboard_music %&gt;% group_by(decade) %&gt;% filter(popularity == 
+    max(popularity)) %&gt;% select(decade, song, artist, popularity, 
+    danceability, energy, valence)))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">decade</th>
+<th align="left">song</th>
+<th align="left">artist</th>
+<th align="right">popularity</th>
+<th align="right">danceability</th>
+<th align="right">energy</th>
+<th align="right">valence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="left">brown eyed girl</td>
+<td align="left">van morrison</td>
+<td align="right">79</td>
+<td align="right">0.491</td>
+<td align="right">0.583</td>
+<td align="right">0.907</td>
+</tr>
+<tr class="even">
+<td align="right">1970</td>
+<td align="left">september</td>
+<td align="left">earth, wind and fire</td>
+<td align="right">80</td>
+<td align="right">0.697</td>
+<td align="right">0.809</td>
+<td align="right">0.980</td>
+</tr>
+<tr class="odd">
+<td align="right">1980</td>
+<td align="left">take on me</td>
+<td align="left">a-ha</td>
+<td align="right">83</td>
+<td align="right">0.573</td>
+<td align="right">0.902</td>
+<td align="right">0.876</td>
+</tr>
+<tr class="even">
+<td align="right">1990</td>
+<td align="left">under the bridge</td>
+<td align="left">red hot chili peppers</td>
+<td align="right">82</td>
+<td align="right">0.559</td>
+<td align="right">0.345</td>
+<td align="right">0.458</td>
+</tr>
+<tr class="odd">
+<td align="right">2000</td>
+<td align="left">i’m yours</td>
+<td align="left">jason mraz</td>
+<td align="right">84</td>
+<td align="right">0.686</td>
+<td align="right">0.457</td>
+<td align="right">0.718</td>
+</tr>
+<tr class="even">
+<td align="right">2010</td>
+<td align="left">thinking out loud</td>
+<td align="left">ed sheeran</td>
+<td align="right">85</td>
+<td align="right">0.781</td>
+<td align="right">0.445</td>
+<td align="right">0.591</td>
+</tr>
+</tbody>
+</table>
+<p>In each decade, the most popular songs tend to vary in their danceability scores (with a range of 0.491 to 0.781, and a mean of 0.63 <span class="math inline">\(\pm\)</span> 0.10) and their energy scores (with a range of 0.379 to 0.902, and a mean of 0.56 <span class="math inline">\(\pm\)</span> 0.22).</p>
+<p>However, popular songs tend to have slightly higher valence – the average valence of these seven most popular songs is 0.67 <span class="math inline">\(\pm\)</span> 0.28, higher than the dataset average of 0.59 <span class="math inline">\(\pm\)</span> 0.24.</p>
+<pre class="r"><code># Least popular songs
+kable(billboard_music %&gt;% arrange(popularity) %&gt;% select(decade, 
+    song, artist, popularity, danceability, energy) %&gt;% head(n = 10))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">decade</th>
+<th align="left">song</th>
+<th align="left">artist</th>
+<th align="right">popularity</th>
+<th align="right">danceability</th>
+<th align="right">energy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="left">funny way of laughin’</td>
+<td align="left">burl ives</td>
+<td align="right">0</td>
+<td align="right">0.438</td>
+<td align="right">0.0872</td>
+</tr>
+<tr class="even">
+<td align="right">1960</td>
+<td align="left">i’m gonna make you mine</td>
+<td align="left">lou christie</td>
+<td align="right">5</td>
+<td align="right">0.565</td>
+<td align="right">0.9000</td>
+</tr>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="left">go jimmy go</td>
+<td align="left">jimmy clanton</td>
+<td align="right">6</td>
+<td align="right">0.684</td>
+<td align="right">0.3740</td>
+</tr>
+<tr class="even">
+<td align="right">1960</td>
+<td align="left">it keeps right on a-hurtin’</td>
+<td align="left">johnny tillotson</td>
+<td align="right">9</td>
+<td align="right">0.423</td>
+<td align="right">0.3120</td>
+</tr>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="left">busted</td>
+<td align="left">ray charles</td>
+<td align="right">9</td>
+<td align="right">0.917</td>
+<td align="right">0.4660</td>
+</tr>
+<tr class="even">
+<td align="right">1960</td>
+<td align="left">painted, tainted rose</td>
+<td align="left">al martino</td>
+<td align="right">9</td>
+<td align="right">0.348</td>
+<td align="right">0.3090</td>
+</tr>
+<tr class="odd">
+<td align="right">1980</td>
+<td align="left">what are we doin’ in love</td>
+<td align="left">dottie west</td>
+<td align="right">10</td>
+<td align="right">0.529</td>
+<td align="right">0.4970</td>
+</tr>
+<tr class="even">
+<td align="right">1960</td>
+<td align="left">you’re the reason i’m living</td>
+<td align="left">bobby darin</td>
+<td align="right">11</td>
+<td align="right">0.430</td>
+<td align="right">0.2040</td>
+</tr>
+<tr class="odd">
+<td align="right">1960</td>
+<td align="left">school is out</td>
+<td align="left">gary u.s. bonds</td>
+<td align="right">12</td>
+<td align="right">0.532</td>
+<td align="right">0.7800</td>
+</tr>
+<tr class="even">
+<td align="right">1960</td>
+<td align="left">venus in blue jeans</td>
+<td align="left">jimmy clanton</td>
+<td align="right">12</td>
+<td align="right">0.514</td>
+<td align="right">0.3810</td>
+</tr>
+</tbody>
+</table>
+<p>The 10 least popular songs of the dataset don’t differ much from the most popular songs in terms of their danceability and energy. The mean danceability of the least popular songs is 0.62 <span class="math inline">\(\pm\)</span> 0.15, and the mean energy is 0.63 <span class="math inline">\(\pm\)</span> 0.19. One commonality between the least popular songs is that they tend to be older: nine of the 10 least popular songs are from the 1960s.</p>
+</div>
+<div id="song-sentiment" class="section level4">
+<h4>Song sentiment</h4>
+<pre class="r"><code>billboard_music_sentiment &lt;- billboard_music %&gt;% mutate(sentiment = case_when(pos &gt; 
+    neu &amp; pos &gt; neg ~ &quot;positive&quot;, neu &gt; pos &amp; neu &gt; neg ~ &quot;neutral&quot;, 
+    neg &gt; pos &amp; neg &gt; neu ~ &quot;negative&quot;)) %&gt;% select(song, artist, 
+    year, sentiment)
+
+kable(head(billboard_music_sentiment))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">song</th>
+<th align="left">artist</th>
+<th align="right">year</th>
+<th align="left">sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">he’ll have to go</td>
+<td align="left">jim reeves</td>
+<td align="right">1960</td>
+<td align="left">neutral</td>
+</tr>
+<tr class="even">
+<td align="left">i’m sorry</td>
+<td align="left">brenda lee</td>
+<td align="right">1960</td>
+<td align="left">neutral</td>
+</tr>
+<tr class="odd">
+<td align="left">it’s now or never</td>
+<td align="left">elvis presley</td>
+<td align="right">1960</td>
+<td align="left">neutral</td>
+</tr>
+<tr class="even">
+<td align="left">stuck on you</td>
+<td align="left">elvis presley</td>
+<td align="right">1960</td>
+<td align="left">neutral</td>
+</tr>
+<tr class="odd">
+<td align="left">the twist</td>
+<td align="left">chubby checker</td>
+<td align="right">1960</td>
+<td align="left">neutral</td>
+</tr>
+<tr class="even">
+<td align="left">everybody’s somebody’s fool</td>
+<td align="left">connie francis</td>
+<td align="right">1960</td>
+<td align="left">neutral</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>billboard_music_sentiment %&gt;% count(sentiment, sort = TRUE) %&gt;% 
+    head()</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   sentiment     n
+##   &lt;chr&gt;     &lt;int&gt;
+## 1 neutral    2951
+## 2 positive     10</code></pre>
+<p>Using mutate(), I generated a ‘sentiment’ variable that uses the pos, neg, and neu scores of each song to classify it as ‘positive,’ ‘neutral,’ or ‘negative.’ For instance, if a song’s pos score is greater than its neu score and neg score, that song is classified as ‘positive,’ and so on.</p>
+<p>Of the most popular songs from 1960 to 2015, 99.7% are ‘neutral,’ and 0.3% are ‘positive.’ No songs were classified as ‘negative.’</p>
+</div>
+<div id="correlation" class="section level4">
+<h4>Correlation</h4>
+<pre class="r"><code>billboard_music_num &lt;- billboard_music %&gt;% select_if(is.numeric) %&gt;% 
+    select(-rank, -year, -words_per_sec, -speechiness, -explicit, 
+        -duration_min) %&gt;% scale()
+
+billboard_cor &lt;- cor(billboard_music_num) %&gt;% round(2)
+
+get_upper_tri &lt;- function(billboard_cor) {
+    billboard_cor[lower.tri(billboard_cor)] &lt;- NA
+    return(billboard_cor)
+}
+upper_tri &lt;- get_upper_tri(billboard_cor)
+billboard_cor_melt &lt;- melt(upper_tri, na.rm = TRUE)
+
+ggplot(data = billboard_cor_melt, aes(Var2, Var1, fill = value)) + 
+    geom_tile(color = &quot;white&quot;) + geom_text(aes(Var2, Var1, label = value), 
+    color = &quot;black&quot;, size = 2.5) + scale_fill_gradient2(low = &quot;blue&quot;, 
+    high = &quot;red&quot;, mid = &quot;white&quot;, midpoint = 0, limit = c(-1, 
+        1), space = &quot;Lab&quot;, name = &quot;Correlation&quot;) + theme_minimal() + 
+    theme(axis.text.x = element_text(angle = 45, size = 10, vjust = 1, 
+        hjust = 1)) + coord_fixed()</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>Looking at the correlation heatmap, there are a few noticeable correlations between the numeric variables:</p>
+<ul>
+<li>Energy is moderately negatively correlated with acousticness (-0.61), and moderately positively correlated with loudness (0.72).</li>
+<li>Danceability is moderately positively correlated with valence (0.5).</li>
+<li>Decade is moderately negatively correlated with acousticness (-0.42), and moderately positively correlated with loudness (0.54) and popularity (0.52).</li>
+</ul>
+</div>
+</div>
+<div id="visualizing" class="section level2">
+<h2>Visualizing</h2>
+<pre class="r"><code>decade_chr &lt;- billboard_music %&gt;% mutate(decade = as.character(decade))
+
+ggplot(decade_chr, aes(danceability, energy, color = decade)) + 
+    geom_point() + scale_color_brewer(palette = &quot;Spectral&quot;) + 
+    ggtitle(&quot;Energy and Danceability by Decade&quot;) + theme_minimal() + 
+    theme(plot.title = element_text(hjust = 0.5)) + xlab(&quot;Danceability&quot;) + 
+    ylab(&quot;Energy&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /> In the above plot, I visualized the correlation between a song’s “energy” and “danceability,” grouped by the decade in which it was included on the Billboard Top 100. “Energy” refers to the intensity of a song; high energy songs tend to be fast, loud, and dense. “Danceability” looks at a song’s tempo, rhythm, and beat strength to determine its suitability for dancing.</p>
+<p>In general, energy and danceability seem to be weakly correlated – songs tend to cluster at the top of the plot, suggesting that Billboard Top 100 songs are likely to be high energy, but are more varied in their danceability. There is a clearer relationship when decade is incorporated into the analysis. When grouping songs by decade, songs released more recently (between 1990 and 2015) consistently have high energy and moderate-to-high danceability. However, older songs (released before 1990) do not tend to cluster in any significant way, and vary widely in their danceability and energy.</p>
+<p>This suggests that older Billboard Top 100 songs (released prior to 1990) had more diverse musical elements. In the last 25 years, Billboard Top 100 songs have become more ‘homogenous’ – popular songs tend to be high energy and easy to dance to.</p>
+<pre class="r"><code>ggplot(billboard_music) + geom_density(aes(year, energy, fill = &quot;e&quot;), 
+    stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, alpha = 0.3) + geom_density(aes(year, 
+    valence, fill = &quot;v&quot;), stat = &quot;summary&quot;, fun.y = &quot;mean&quot;, alpha = 0.3) + 
+    scale_fill_manual(name = &quot;Music Metric&quot;, values = c(e = &quot;deeppink&quot;, 
+        v = &quot;deepskyblue&quot;), labels = c(e = &quot;Energy&quot;, v = &quot;Valence&quot;)) + 
+    theme_minimal() + scale_x_continuous(breaks = c(1960, 1965, 
+    1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015)) + 
+    xlab(&quot;Year&quot;) + ylab(&quot;Metric Score&quot;) + theme(axis.text.x = element_text(angle = 60, 
+    hjust = 1)) + ggtitle(&quot;Energy and Valence by Decade&quot;) + theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>Over the past 55 years, there have been clear trends in popular songs’ “energy” and “valence.” Here, “valence” refers to the musical positiveness that a song conveys (whether a song is happy and cheerful).</p>
+<p>In the 1960s, Billboard Top 100 songs had a mean valence that was larger than the mean energy, suggesting that popular songs of this era were “chill” – cheerful but not intense or noisy. By the 2010s, however, this distribution had flipped. Billboard Top 100 songs of the past couple decades have a mean energy that is larger than the mean valence. This suggests that, as time progressed, popular songs have become sadder but more energetic.</p>
+<pre class="r"><code>decade_chr %&gt;% filter(Gender %in% c(&quot;female&quot;, &quot;male&quot;)) %&gt;% ggplot(aes(x = decade, 
+    y = acousticness, fill = Gender)) + stat_boxplot(geom = &quot;errorbar&quot;) + 
+    geom_boxplot(outlier.shape = NA) + ggtitle(&quot;Acousticness and Artist&#39;s Gender by Decade&quot;) + 
+    xlab(&quot;Decade&quot;) + ylab(&quot;Acousticness&quot;) + scale_fill_brewer(palette = &quot;Pastel1&quot;) + 
+    theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>Lastly, I wanted to examine if an artist’s gender influenced the musical elements of their songs. In the plot above, “acousticness” measures whether a song used primarily acoustic or electronic instruments, with a large score correlating to a highly acoustic song.</p>
+<p>In general, acousticness has declined greatly over time. Billboard Top 100 songs of the last 15 years or so have low mean acousticness scores, indicating a shift towards primarily electronic music. While acousticness overall has been on the decline, from 1960 to 1999 female singers tended to have higher acousticness scores than male singers. Beginning in 2000, however, there is no significant difference in acousticness scores on the basis of gender, as both male and female artists are consistently non-acoustic.</p>
+</div>
+<div id="dimensionality-reduction" class="section level2">
+<h2>Dimensionality Reduction</h2>
+<p>I conducted Principal Component Analysis on this dataset, focusing on four numeric variables: danceability, energy, acousticness, and valence.</p>
+<div id="preparing-the-data-and-computing-pca" class="section level4">
+<h4>Preparing the data and computing PCA</h4>
+<p>Before beginning PCA, the chosen numeric variables were normalized using scale(). PCA was conducted using princomp().</p>
+<pre class="r"><code># Preparing the data
+bm_num &lt;- billboard_music %&gt;% select(danceability, energy, acousticness, 
+    valence) %&gt;% scale
+rownames(bm_num) &lt;- billboard_music$song
+
+# Computing principal analysis components
+bm_pca &lt;- princomp(bm_num)
+summary(bm_pca, loadings = T)</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1    Comp.2    Comp.3     Comp.4
+## Standard deviation     1.4541794 0.9987666 0.7601146 0.55560979
+## Proportion of Variance 0.5288381 0.2494679 0.1444924 0.07720163
+## Cumulative Proportion  0.5288381 0.7783060 0.9227984 1.00000000
+## 
+## Loadings:
+##              Comp.1 Comp.2 Comp.3 Comp.4
+## danceability  0.453  0.580  0.573  0.360
+## energy        0.534 -0.454 -0.353  0.620
+## acousticness -0.512  0.491 -0.439  0.551
+## valence       0.497  0.465 -0.595 -0.427</code></pre>
+</div>
+<div id="choosing-principal-components" class="section level4">
+<h4>Choosing principal components</h4>
+<p>The proportional variance for each principal component was computed by first squaring the standard deviation outputs, and then dividing each variance by the total variance. To visualize the proportional variance of each principal component, a Scree plot was generated.</p>
+<pre class="r"><code>eigval &lt;- bm_pca$sdev^2
+varprop = round(eigval/sum(eigval), 2)
+
+ggplot() + geom_bar(aes(y = varprop, x = 1:4), stat = &quot;identity&quot;) + 
+    xlab(&quot;&quot;) + geom_path(aes(y = varprop, x = 1:4)) + geom_text(aes(x = 1:4, 
+    y = varprop, label = round(varprop, 2)), vjust = 1, col = &quot;white&quot;, 
+    size = 5) + scale_y_continuous(breaks = seq(0, 0.6, 0.2), 
+    labels = scales::percent) + scale_x_continuous(breaks = 1:10) + 
+    xlab(&quot;Principal Component&quot;) + ylab(&quot;Proportion of Variance&quot;) + 
+    ggtitle(&quot;Scree Plot&quot;) + theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>The Scree plot above shows the proportion of variance explained by each principal component. Principal component 1 (PC1) and principal component 2 (PC2) together explain 77.83% of the variance in the dataset. This is close to 80%, and thus PC1 and PC2 should be sufficient for this analysis.</p>
+</div>
+<div id="visualizing-and-interpreting-principal-components" class="section level3">
+<h3>Visualizing and interpreting principal components</h3>
+<p>First, the PC scores for each observation were plotted in a scatterplot. Then, the loadings for each principal component were plotted to visualize their relationships with each other.</p>
+<pre class="r"><code># Plotting PC1 vs. PC2
+ggplot() + geom_point(aes(bm_pca$scores[, 1], bm_pca$scores[, 
+    2])) + xlab(&quot;PC1&quot;) + ylab(&quot;PC2&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Loadings plot
+bm_pca$loadings[1:4, 1:2] %&gt;% as.data.frame %&gt;% rownames_to_column %&gt;% 
+    ggplot() + geom_hline(aes(yintercept = 0), lty = 2) + geom_vline(aes(xintercept = 0), 
+    lty = 2) + ylab(&quot;PC2&quot;) + xlab(&quot;PC1&quot;) + geom_segment(aes(x = 0, 
+    y = 0, xend = Comp.1, yend = Comp.2), arrow = arrow(), col = &quot;red&quot;) + 
+    geom_label(aes(x = Comp.1 * 1.1, y = Comp.2 * 1.1, label = rowname, 
+        hjust = 0.33))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-14-2.png" width="768" style="display: block; margin: auto;" /></p>
+<p>PC1 correlates positively with danceability, energy, and valence, and correlates negatively with acousticness. PC1 can thus be interpreted as a general ‘liveliness’ score. Songs with a large PC1 score tend to be primarily electronic, cheerful, energetic, and easy to dance to. Songs with a low PC2 score tend to be acoustic, sad, and low energy with a slow tempo.</p>
+<p>PC2 correlates positively with danceability, acousticness, and valence, and correlates negatively with energy. PC2 can be interpreted as a ‘mood’ score. Songs with a large PC2 score tend to be acoustic, low energy, have good beats and rhythm, and be cheerful. Conversely, songs with low PC2 scores tend to convey negativity, and be electronic, intense, and hard to dance to.</p>
+<p>When plotting PC1 versus PC2, there are no clear clusters formed, though there seems to be a larger density of points with large PC1 scores, suggesting that popular songs tend to be lively.</p>
+<p>When examining the loadings plot of PC1 and PC2, it can be seen that danceability and valence are correlated (cheerful songs tend to have good rhythm, tempo, and beat strength). However, there are no strong positive correlations between any of the other variables, though acousticness appears to be negatively correlated with danceability, energy, and valence.</p>
+<div id="computing-pc-scores-for-notable-observations" class="section level4">
+<h4>Computing PC scores for notable observations</h4>
+<pre class="r"><code>Name &lt;- (billboard_music$song)
+
+# PC 1:
+bm_pca$scores %&gt;% as.data.frame %&gt;% cbind(Name, .) %&gt;% top_n(3, 
+    Comp.1)</code></pre>
+<pre><code>##                             Name   Comp.1    Comp.2      Comp.3    Comp.4
+## 1 i&#39;ve got to use my imagination 2.646357 1.0241737  0.05794685 0.5596344
+## 2    wanna be startin&#39; somethin&#39; 2.550248 0.3406374 -0.01171722 0.4309845
+## 3                      move this 2.541192 0.2402820 -0.59380734 0.3466787</code></pre>
+<pre class="r"><code>billboard_music %&gt;% filter(Name %in% c(&quot;i&#39;ve got to use my imagination&quot;, 
+    &quot;wanna be startin&#39; somethin&#39;&quot;, &quot;move this&quot;)) %&gt;% select(song, 
+    artist, acousticness, danceability, energy, valence)</code></pre>
+<pre><code>## # A tibble: 3 x 6
+##   song              artist         acousticness danceability energy valence
+##   &lt;chr&gt;             &lt;chr&gt;                 &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+## 1 i&#39;ve got to use ~ gladys knight~       0.105         0.925  0.882   0.964
+## 2 wanna be startin~ michael jacks~       0.0219        0.846  0.922   0.899
+## 3 move this         technotronic         0.0637        0.782  0.96    0.979</code></pre>
+<pre class="r"><code># PC 2:
+bm_pca$scores %&gt;% as.data.frame %&gt;% cbind(Name, .) %&gt;% top_n(3, 
+    wt = Comp.2)</code></pre>
+<pre><code>##              Name     Comp.1   Comp.2     Comp.3     Comp.4
+## 1  sweet nothin&#39;s -0.6279435 2.957487 -0.6268063  0.1056775
+## 2   just one look -0.0865459 2.970127 -0.4426205  0.3867316
+## 3 motorcycle mama -2.2042882 2.952968 -0.4077090 -0.1010813</code></pre>
+<pre class="r"><code>billboard_music %&gt;% filter(Name %in% c(&quot;sweet nothin&#39;s&quot;, &quot;just one look&quot;, 
+    &quot;motorcycle mama&quot;)) %&gt;% select(song, artist, acousticness, 
+    danceability, energy, valence)</code></pre>
+<pre><code>## # A tibble: 3 x 6
+##   song            artist     acousticness danceability energy valence
+##   &lt;chr&gt;           &lt;chr&gt;             &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+## 1 sweet nothin&#39;s  brenda lee        0.785        0.787  0.359   0.933
+## 2 just one look   doris troy        0.735        0.856  0.436   0.944
+## 3 motorcycle mama sailcat           0.936        0.687  0.154   0.733</code></pre>
+<p>The three songs with the highest PC1 scores are “I’ve Got to Use My Imagination” by Gladys Knight and the Pips, “Wanna be Startin’ Somethin’” by Michael Jackson, and “Move This” by Technotronic. These are the ‘liveliest’ songs in the dataset: they have high danceability, energy, and valence, and low acousticness.</p>
+<p>The three songs with the highest PC2 scores are “Sweet Nothin’s” by Brenda Lee, “Just One Look” by Doris Troy, and “Motorcycle Mama” by Sailcat. These are the most ‘relaxed and cheerful’ songs in the dataset: they have high acousticness, danceability, and valence, but low energy.</p>
+</div>
+</div>
+</div>
