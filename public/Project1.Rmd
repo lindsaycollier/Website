@@ -10,7 +10,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
-opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, fig.width=8,tidy.opts=list(width.cutoff=60),tidy=TRUE)
+opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, warning=FALSE, fig.width=8,tidy.opts=list(width.cutoff=60),tidy=TRUE)
 ```
 
 ```{R, include=FALSE}
@@ -55,52 +55,15 @@ The _music_ dataset contains songs sourced from Billboard's Top 100 lists from 1
 
 After analyzing this data, I expect to find that more popular songs will have high danceability, energy, and valence scores. I expect that, over time, popular songs have decreased in acousticness, and increased in danceability and energy.
 
-###Tidying
-
-The datasets chosen for this analysis were already tidy, so they were made 'untidy' using dplyr functions and tidied again. In addition to being tidied, several unnecessary variables were removed from each dataset to reduce their size.
-
-```{R}
-#Tidying 'billboard'
-billboard_untidy <- billboard %>% pivot_longer(4:14, names_to="song_metric", 
-    values_to="metric_value") %>% pivot_longer(4:7, names_to = "song_time_metric",
-    values_to = "time_value")
-
-billboard_tidy <- billboard_untidy %>% pivot_wider(names_from = "song_metric",
-    values_from = "metric_value") %>% pivot_wider(names_from = "song_time_metric",
-    values_from = "time_value")
-
-billboard <- billboard_tidy %>% select(rank,song, artist, year, everything()) %>% 
-  select(-uniq_ratio, -num_words, -num_uniq_words, -liveness)
-
-glimpse(billboard)
-
-#Tidying 'music'
-music_untidy <- music %>% pivot_longer(4:6, names_to = "song_feeling", 
-  values_to = "feeling_value") %>%   pivot_longer(4:12, names_to="song_metric",
-  values_to = "metric_value")
-  
-music_tidy <- music_untidy %>% pivot_wider(names_from = "song_feeling", 
-  values_from = "feeling_value") %>% pivot_wider(names_from="song_metric", 
-  values_from = "metric_value")
-
-music <- music_tidy %>% select(-year_bin,-cluster,-num_words, -num_lines, 
-   -num_dupes, -compound, -difficult_words, -num_syllables, -flesch_index, 
-   -f_k_grade)
-
-glimpse(music)
-
-```
-
-##Joining and Merging
+##Joining and Merging Datasets
 
 The two datasets were merged using a full_join() function. This join was chosen because I wanted to retain all of the original data from both datasets when merging. Any non-matching entries were then removed using na.omit().
 
 During the merge, several cases were dropped from both datasets. Originally, the _billboard_ dataset contained 5,566 observations, and the _music_ dataset contained 3,807 observations. After joining and removing "NA" entries, the final merged dataset contains 2,961 observations, meaning that 6,412 observations were dropped. 
 
 
-```{R}
-billboard_music <- full_join(billboard,music,by=c("song","artist","year")) %>% 
-  na.omit()
+```{R, echo=FALSE}
+billboard_music <- full_join(billboard,music,by=c("song","artist","year")) %>% na.omit()
 
 glimpse(billboard_music) 
 ```
@@ -115,22 +78,20 @@ Given the large number of numerical variables in the final datasets, I will be r
 
 ####Mean and standard deviations of four numeric variables grouped by decade
 
-```{R}
+```{R,echo=FALSE}
 summary_stats_decade <- billboard_music %>% group_by(decade) %>%
-  summarize(mean(danceability), sd(danceability), mean(energy), sd(energy),
-  mean(acousticness), sd(acousticness)) %>% 
-  round(2)
+  summarize("mean danceability"=mean(danceability), sd_danceability=sd(danceability), mean_energy=mean(energy), sd_energy=sd(energy)) %>% round(2)
 
 kable(head(summary_stats_decade))
 
 summary_stats_decade2 <- billboard_music %>% group_by(decade) %>%
-  summarize(mean(valence), sd(valence)) %>% 
+  summarize(mean_acousticness=mean(acousticness), sd_acousticness=sd(acousticness), mean_valence=mean(valence), sd_valence=sd(valence)) %>% 
   round(2)
 
 kable(head(summary_stats_decade2))
 ```
 
-The complete summary statistics reporting mean and standard deviation for five numeric variables can be seen above. 
+Summary statistics reporting mean and standard deviation for four numeric variables can be seen above. 
 
 Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 $\pm$ 0.15 in the 1960s to 0.64 $\pm$ 0.12 in the 2010s. The mean energy score increased from 0.49 $\pm$ 0.2 in the 1960s to 0.72 $\pm$ 0.16 in the 2010s.
 
@@ -138,7 +99,7 @@ By contrast, the mean acousticness has decreased over time, from 0.53 $\pm$ 0.28
 
 ####Song popularity
 
-```{R}
+```{R,echo=FALSE}
 #Most popular songs
 kable(head(billboard_music %>% group_by(decade) %>% filter(popularity==max(popularity)) %>%
     select(decade, song, artist, popularity, danceability, energy, valence)))
@@ -148,7 +109,7 @@ In each decade, the most popular songs tend to vary in their danceability scores
 
 However, popular songs tend to have slightly higher valence -- the average valence of these seven most popular songs is 0.67 $\pm$ 0.28, higher than the dataset average of 0.59 $\pm$ 0.24. 
 
-```{R}
+```{R,echo=FALSE}
 #Least popular songs
 kable(billboard_music %>% arrange(popularity) %>%
         select(decade,song,artist,popularity,danceability,energy) %>% 
@@ -159,7 +120,7 @@ The 10 least popular songs of the dataset don't differ much from the most popula
 
 ####Song sentiment
 
-```{R}
+```{R,include=FALSE}
 billboard_music_sentiment <- billboard_music %>% 
   mutate(sentiment = case_when(pos > neu & pos > neg ~ "positive", 
                                neu > pos & neu > neg ~ "neutral", 
@@ -177,7 +138,7 @@ Of the most popular songs from 1960 to 2015, 99.7% are 'neutral,' and 0.3% are '
 
 ####Correlation
 
-```{R}
+```{R,echo=FALSE}
 billboard_music_num <- billboard_music %>% select_if(is.numeric) %>% 
   select(-rank, -year, -words_per_sec, -speechiness, -explicit, -duration_min) %>% 
   scale()
@@ -212,7 +173,7 @@ Looking at the correlation heatmap, there are a few noticeable correlations betw
 
 ##Visualizing
 
-```{R}
+```{R,echo=FALSE}
 decade_chr <- billboard_music %>% mutate(decade=as.character(decade)) 
 
 ggplot(decade_chr, aes(danceability, energy, color = decade)) + 
@@ -230,7 +191,7 @@ In general, energy and danceability seem to be weakly correlated -- songs tend t
 This suggests that older Billboard Top 100 songs (released prior to 1990) had more diverse musical elements. In the last 25 years, Billboard Top 100 songs have become more 'homogenous' -- popular songs tend to be high energy and easy to dance to. 
 
 
-```{R}
+```{R,echo=FALSE}
 ggplot(billboard_music) + 
   geom_density(aes(year,energy, fill = "e"), 
                stat="summary", fun.y="mean", alpha = 0.3) + 
@@ -254,7 +215,7 @@ Over the past 55 years, there have been clear trends in popular songs' "energy" 
 In the 1960s, Billboard Top 100 songs had a mean valence that was larger than the mean energy, suggesting that popular songs of this era were "chill" -- cheerful but not intense or noisy. By the 2010s, however, this distribution had flipped. Billboard Top 100 songs of the past couple decades have a mean energy that is larger than the mean valence. This suggests that, as time progressed, popular songs have become sadder but more energetic. 
 
 
-```{R}
+```{R,echo=FALSE}
 decade_chr %>% 
   filter(Gender %in% c("female","male")) %>%
   ggplot(aes(x=decade, y=acousticness, fill=Gender)) +
@@ -278,7 +239,7 @@ I conducted Principal Component Analysis on this dataset, focusing on four numer
 
 Before beginning PCA, the chosen numeric variables were normalized using scale(). PCA was conducted using princomp().
 
-```{R}
+```{R,include=FALSE}
 #Preparing the data
 bm_num <- billboard_music %>% 
   select(danceability,energy,acousticness,valence) %>% 
@@ -294,7 +255,7 @@ summary(bm_pca,loadings=T)
 
 The proportional variance for each principal component was computed by first squaring the standard deviation outputs, and then dividing each variance by the total variance. To visualize the proportional variance of each principal component, a Scree plot was generated.
 
-```{R}
+```{R,echo=FALSE}
 eigval <- bm_pca$sdev^2 
 varprop = round(eigval/sum(eigval), 2) 
 
@@ -315,7 +276,7 @@ The Scree plot above shows the proportion of variance explained by each principa
 
 First, the PC scores for each observation were plotted in a scatterplot. Then, the loadings for each principal component were plotted to visualize their relationships with each other.
 
-```{R}
+```{R,echo=FALSE}
 #Plotting PC1 vs. PC2
 ggplot()+geom_point(aes(bm_pca$scores[,1], bm_pca$scores[,2])) + 
   xlab("PC1") + ylab("PC2")
@@ -338,7 +299,7 @@ When examining the loadings plot of PC1 and PC2, it can be seen that danceabilit
 
 ####Computing PC scores for notable observations
 
-```{R}
+```{R,include=FALSE}
 Name<-(billboard_music$song)
 
 #PC 1: 
