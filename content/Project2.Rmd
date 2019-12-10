@@ -1,7 +1,6 @@
 ---
 title: 'Project 2: Modeling, Testing, and Predicting'
 author: "Lindsay Collier (lmc3746)"
-date: "November 26, 2019"
 output:
   pdf_document: default
   html_document:
@@ -19,6 +18,7 @@ library(plotROC)
 library(knitr)
 library(glmnet)
 library(vegan)
+library(kableExtra)
 
 hook_output = knit_hooks$get('output')
 knit_hooks$set(output = function(x, options) {
@@ -61,7 +61,7 @@ class_diag<-function(probs,truth){
 
 ### Introduction
 
-For this project, I will be using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, *ad*, contains the binary response variable 'clicked on ad,' quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender. 
+For this project, I will be building a predictive model using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, *ad*, contains the binary response variable 'clicked on ad,' quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender. 
 
 ```{R, echo=FALSE}
 
@@ -80,20 +80,35 @@ ad_scale <- ad %>% transmute(income=scale(income), daily_site_time=scale(daily_s
                              age=scale(age), daily_internet_time=scale(daily_internet_time),
                              gender=gender, clicked=clicked)
 
-ad %>% select(clicked,gender,age,income,daily_site_time,daily_internet_time) %>% head %>% kable
+ad %>% select(clicked,gender,age,income,daily_site_time,daily_internet_time) %>% head %>% knitr::kable() %>% kable_styling()
+
+#ad %>% summarize("clicked"=clicked,"gender"=gender,"age"=age,"income"=income,"daily site time"=daily_site_time,"daily internet time"=daily_internet_time) %>% head %>% knitr::kable() %>% kable_styling()
 ```
 
 ### Testing Variables
 
-```{R}
+To see which numeric variables, if any, explained any significant variation in the response variable (whether a user clicked on an ad), a MANOVA test was performed.
+
+```{R,echo=FALSE}
 #MANOVA
 manova <- manova(cbind(daily_site_time,age,income,daily_internet_time)~clicked, data = ad)
 
 summary(manova)
+```
+
+The results of the MANOVA show that there are significant differences in the four dependent measures (daily time spent on site, daily internet usage, area income, and age) across the two levels of the "clicked on ad" variable, with a p-value <0.05. 
+
+Univariate ANOVAs were performed on each of the four dependent variables.
+
+```{R,echo=FALSE}
 
 #univariate ANOVAs
 summary.aov(manova)
+```
 
+All four responses showed significant mean differences across the two groups of the "clicked on ad" variable, with a p-value <0.05. Post hoc analysis of these four variables was consistent with the univariate ANOVAs, in that each response variable was shown to significantly differ across the binary groups (0 or 1) of the "clicked on ad" variable.
+
+```{R,include=FALSE}
 #post-hoc t-tests
 pairwise.t.test(ad$daily_site_time, ad$clicked, p.adj="none")
 
@@ -102,6 +117,9 @@ pairwise.t.test(ad$age, ad$clicked, p.adj="none")
 pairwise.t.test(ad$income, ad$clicked, p.adj="none")
 
 pairwise.t.test(ad$daily_internet_time, ad$clicked, p.adj="none")
+
+```
+```{R,include=FALSE}
 
 #type I error
 1-(1-0.05)^9
@@ -122,18 +140,17 @@ for(i in 1:2){print(covmats$covs[i])}
 
 ```
 
-The results of the MANOVA show that there are significant differences in the four dependent measures (daily time spent on site, daily internet usage, area income, and age) across the two levels of the "clicked on ad" variable, with a p-value <0.05. 
-
-Univariate ANOVAs were performed on each of the four dependent variables. All four responses showed significant mean differences across the two groups of the "clicked on ad" variable, with a p-value <0.05. Post hoc analysis of these four variables was consistent with the univariate ANOVAs, in that each response variable was shown to significantly differ across the binary groups (0 or 1) of the "clicked on ad" variable.
-
 For this analysis, 9 tests were performed (1 MANOVA, 4 ANOVAs, and 4 t-tests). The probability of type I error is 36.98%. The Bonferroni correction is thus 0.05/9 = 0.0056. Even after incorporating this Bonferroni adjustment, each numeric variable differs significantly across the two levels of the "clicked on ad" variable.
-
-There is relative multivariate normality among the response variables, and there seems to be homogenous covariances among the groups.
-
 
 ### Randomization Test
 
-```{R}
+In addition to the MANOVA above, I performed a randomization MANOVA test on this data and tested the following null hypothesis:
+
+H~0~: Whether a user clicked on an ad does not vary by age, income, daily time spent on a site, and daily time spent on the internet.
+
+H~A~: Whether a user clicked on an ad does vary by age, income, daily time spent on a site, and daily time spent on the internet.
+
+```{R,echo=FALSE}
 #compute observed F
 distances <- ad %>% select(daily_site_time,age,income,daily_internet_time) %>% dist()
 
@@ -155,7 +172,7 @@ SSW <- new %>% group_by(clicked) %>% select(daily_site_time,age,income,daily_int
 })
 
 #histogram of null distribution
-hist(Fs,prob=T)
+#hist(Fs,prob=T)
 
 #histogram that visualizes observed F
 hist(Fs,prob = T,breaks=seq(0, 300, by=5), xlim=c(0,300), xaxt="n")
@@ -164,23 +181,16 @@ axis(1, at=seq(0 , 300, by=5), lwd=0, lwd.ticks=1)
 abline(v=F_obs, col="red", add=T) 
 
 #confirming results
-adonis(distances ~ clicked, data = ad)
+#adonis(distances ~ clicked, data = ad)
 ```
 
-I performed a randomization MANOVA test on this data and tested the following null hypothesis:
-
-H~0~: Whether a user clicked on an ad does not vary by age, income, daily time spent on a site, and daily time spent on the internet.
-
-H~A~: Whether a user clicked on an ad does vary by age, income, daily time spent on a site, and daily time spent on the internet.
-
-The observed F-value is significantly larger than the null distribution. As such, I can conclude that the response variable ('clicked') varies significantly by the descriptive variables analyzed here (age, income, daily time spent on a site, and daily time spent on the internet).
-
-I confirmed these results with adonis().
-
+The observed F-value (red line) is significantly larger than the null distribution, visualized above. As such, I can conclude that the response variable ('clicked') varies significantly by the descriptive variables analyzed here (age, income, daily time spent on a site, and daily time spent on the internet).
 
 ### Linear Regression Model
 
-```{R}
+First, I built a linear model predicting daily time spent on a site by area income and gender.
+
+```{R,echo=FALSE}
 #mean-centering numeric variables 
 ad <- ad %>% mutate(income = scale(income, scale=FALSE), age = scale(age, scale=FALSE),
                     daily_site_time = scale(daily_site_time, scale=FALSE), 
@@ -192,9 +202,15 @@ summary(linear)
 
 ggplot(ad, aes(x=income, y=daily_site_time, color=gender)) + geom_point() + 
   geom_smooth(method = "lm") + ylab("Daily Time Spent on Site") + xlab("Income")
+```
 
+After running the linear model, the coefficient estimate for the income variable is 3.6 x 10<sup>-4</sup>, the coefficient estimate for the gender variable is -1.27, and the coefficient estimate for the interaction between income and gender is 1.2 x 10<sup>-5</sup>.
+
+For males, for each unit increase in income, the average daily time spent on a site increases by 3.72 x 10<sup>-4</sup>. For females, for each unit increase in income, the average daily time spent on a site increases by 3.6 x 10<sup>-4</sup>. Additionally, males' average daily time spent on a site is 1.27 units less than females'.
+
+```{R,echo=FALSE}
 #checking assumptions: homoskedasticity
-bptest(linear) 
+#bptest(linear) 
 
 #checking assumptions: linearity
 residuals<-linear$residuals
@@ -204,24 +220,25 @@ ggplot()+geom_point(aes(fitted_values,residuals))+geom_hline(yintercept=0, color
 #checking assumptions: normality
 qqnorm(ad$daily_site_time, pch = 1, frame = FALSE) 
 qqline(ad$daily_site_time, col = "red", lwd = 2)
+```
 
+To test the homoskedasticity assumption, I performed a Breusch-Pagan test, and computed a p-value < 0.05. Thus, the null hypothesis of homoskedasticity was thus rejected, and the data is heteroskedastic. To test the linearity assumption, I plotted the fitted values against the residuals, and concluded that the data was not scattered randomly arround the mean, and thus the data is not linear. Finally, to test the normality assumption, I plotted a qq-plot and concluded that the data is not normally distributed.
+
+Because the data used in this model fails the homoskedasticity assumption, I re-ran the regression results with robust standard errors. 
+
+```{R,echo=FALSE}
 #robust standard errors
-coeftest(linear, vcov = vcovHC(linear)) 
+coeftest(linear, vcov = vcovHC(linear))
 
 ```
 
-I built a linear model predicting daily time spent on a site by area income and gender. After running the linear model, the coefficient estimate for the income variable, $\beta_1$, is $3.6*10^{-4}$, the coefficient estimate for the gender variable, $\beta_2$, is -1.27, and the coefficient estimate for the interaction between income and gender, $\beta_3$, is $1.2*10^{-5}$.
-
-For males, for each unit increase in income, the average daily time spent on a site increases by $\beta_1$+$\beta_3$ = $3.72*10^{-4}$. For females, for each unit increase in income, the average daily time spent on a site increases by $3.6*10^{-4}$. Additionally, males' average daily time spent on a site is 1.27 units less than females'.
-
-To test the homoskedasticity assumption, I performed a Breusch-Pagan test, and computed a p-value < 0.05. Thus, the null hypothesis of homoskedasticity is rejected, and the data is heteroskedastic. To test the linearity assumption, I plotted the fitted values against the residuals, and concluded that the data was not scattered randomly arround the mean, and thus the data is not linear. Finally, to test the normality assumption, I plotted a qq-plot and concluded that the data is not normally distributed.
-
-After re-running the regression results with robust standard errors, the significance of the analyzed variables did not change. The income variable was found to have a significant positive relationship with daily time spent on a site. Gender and the interaction between gender and income were not found to be significant. The proportion of variation in the outcome explained by this linear model is 9.7%.
-
+I observed that the significance of the analyzed variables did not change: the income variable was found to have a significant positive relationship with daily time spent on a site, but gender and the interaction between gender and income were not found to be significant. The proportion of variation in the outcome explained by this linear model is 9.7%.
 
 ### Linear Regression Model with Bootstrapped Standard Errors
 
-```{R}
+I decided to compute bootstrapped standard errors for this linear model and compare them to the previously-computed standard errors, in order to identify any significant differences.
+
+```{R,echo=FALSE}
 #bootstrapped standard errors
 linear_sample1 <- replicate(5000, {
   linear_boot <- ad[sample(nrow(ad), replace=TRUE),]
@@ -230,7 +247,13 @@ linear_sample1 <- replicate(5000, {
 })
 
 linear_sample1 %>% t %>% as.data.frame %>% summarize_all(mean)
+```
 
+The values of the bootstrapped standard errors for each coefficient estimate do not differ very much from the non-bootstrapped standard errors. 
+
+I additionally computed bootstrapped p-values for the model's coefficient estimates and found them to also be relatively similar to the non-bootstrapped estimates.
+
+```{R,echo=FALSE}
 #bootstrapped p-values
 linear_sample2 <- replicate(5000, {
   linear_boot <- ad[sample(nrow(ad), replace=TRUE),]
@@ -242,15 +265,21 @@ linear_sample2 %>% t %>% as.data.frame %>% summarize_all(mean)
 
 ```
 
-The values of the bootstrapped standard errors for each coefficient estimate do not differ very much from the non-bootstrapped standard errors. The p-values for these bootstrapped coefficient estimates are also relatively similar to the non-bootstrapped estimates; the bootstrapped p-value for the 'income' coefficient is larger than the non-bootstrapped p-value, though it is still significant. The bootstrapped p-values for the 'gender' variable and the interaction between 'gender' and 'income' are both insignificant.
-
+The bootstrapped p-value for the 'income' coefficient is larger than the non-bootstrapped p-value, though it is still significant. The bootstrapped p-values for the 'gender' variable and the interaction between 'gender' and 'income' are both insignificant.
 
 ### Logisitic Regression Model
 
-```{R}
+Because the linear regression model proved to be a poor predictor for this dataset, I then constructed a logistic regression model to predict whether a user will click on an ad, using income and age as predictors.
+
+```{R,echo=FALSE}
 #logisitic regression model
 logistic_fit <- glm(clicked ~ income+age, data=ad, family="binomial")
 summary(logistic_fit)
+```
+
+After running this model, both coefficients were found to be significant, with p-values < 0.05. For every 1 unit increase in income, the odds of a user clicking on ad decrease by e<sup>-1.03 x 10<sup>-4</sup></sup>. For every 1 unit increase in age, the odds of a user clicking on an ad increase by e<sup>0.163</sup>.
+
+```{R,echo=FALSE}
 
 #confusion matrix
 prob <- predict(logistic_fit, type = "response") 
@@ -258,24 +287,37 @@ pred <- ifelse(prob > 0.5, 1, 0)
 
 table(truth = ad$clicked, prediction = pred) %>% addmargins
 
-(430+379)/1000 #accuracy  
-379/449 #tpr
-430/551 #tnr
-379/500 #ppv
+#(430+379)/1000 #accuracy  
+#379/449 #tpr
+#430/551 #tnr
+#379/500 #ppv
+```
 
+This logistic model's diagnostic statistics are decent. The model has an accuracy of 0.809, a sensitivity of 0.844, a specificity of 0.780, and a recall of 0.758. Thus, this model has a high proportion of correctly classified cases and accurate predictions.
+
+I constructed a logit density plot and an ROC curve for this model, as seen below.
+
+```{R,echo=FALSE}
 #logit density plot
 ad1 <- ad
 ad1$logit <- predict(logistic_fit, type = "link") 
 ad1$clicked <- as.factor(ad$clicked)
 
 ggplot(ad1, aes(logit, fill = clicked)) + geom_density(alpha = 0.3) + 
-  scale_fill_discrete(name = "Clicked on Ad", labels = c("No", "Yes"))
+  scale_fill_discrete(name = "Clicked on Ad", labels = c("No", "Yes")) + ggtitle("Logit Density")
 
 #ROC curve
-roc <- ggplot(ad) + geom_roc(aes(d=clicked, m=prob),n.cuts=0)
+roc <- ggplot(ad) + geom_roc(aes(d=clicked, m=prob),n.cuts=0) + ggtitle("ROC Curve")
 roc
 
-calc_auc(roc)
+#calc_auc(roc)
+```
+
+This model has an AUC of 0.874. This means that there is a 87.4% probability that a randomly selected person who clicked on an ad has a higher prediction value than a randomly selected person who did not click on ad.
+
+10-fold cross-validation was performed to compute this model's out-of-sample performance.
+
+```{R,echo=FALSE}
 
 #10-fold cross-validation
 set.seed(123)
@@ -300,18 +342,14 @@ apply(diags, 2, mean)
 
 ```
 
-I built a logistic model predicting if a user clicked on an ad by area income, age, and daily time spent on the internet. After running this model, all coefficients were found to be significant, with p-values < 0.05. For every 1 unit increase in income, the odds of a user clicking on ad decrease by $e^{-1.03*10^{-4}}$. For every 1 unit increase in age, the odds of a user clicking on an ad increase by $e^{0.163}$. 
-
-This logistic model's diagnostic statistics are decent. The model has an accuracy of 0.809, a sensitivity of 0.844, a specificity of 0.780, and a recall of 0.758. Thus, this model has a high proportion of correctly classified cases and accurate predictions.
-
-This model has an AUC of 0.874. This means that there is a 87.4% probability that a randomly selected person who clicked on an ad has a higher prediction value than a randomly selected person who did not click on ad.
-
-10-fold cross-validation was performed to compute this model's out-of-sample performance. The out-of-sample accuracy is 0.807, its sensitivity is 0.762, and its recall is 0.840. Ultimately, these diagnostic statistics are similar to the model's in-sample performance, and thus I can conclude that this model is a reliable predictor of the outcome variable.
+The out-of-sample accuracy is 0.807, its sensitivity is 0.762, and its recall is 0.840. Ultimately, these diagnostic statistics are similar to the model's in-sample performance, and thus I can conclude that this simple logistic model is a reliable predictor of the outcome variable.
 
 
 ### LASSO Regression Model
 
-```{R}
+To improve the logistic model's performance, I performed LASSO on the entire dataset to select the most important variables to incorporate into the logistic model.
+
+```{R,echo=FALSE}
 #lasso variable selection
 fit <-  glm(clicked ~ -1 + income + age + daily_site_time + daily_internet_time + gender, 
             data = ad_scale, family = "binomial")
@@ -345,10 +383,12 @@ for(i in 1:k){
 }
 
 apply(diags, 2, mean) 
+
 ```
 
-After running a Lasso regression, the variables that were retained are age, income, daily time spent on a site, and daily time spent on the internet. The gender variable was dropped. 10-fold cross-validation was performed on a new model containing only Lasso-selected variables, and it was found that this new model's out-of-sample accuracy was greatly improved over the model in #5. This model has an accuracy of 0.967, a sensitivity of 0.957, and a recall of 0.978.
+After running a Lasso regression, the variables that were retained are age, income, daily time spent on a site, and daily time spent on the internet. The gender variable was dropped. 
 
+10-fold cross-validation was performed on a new model containing only Lasso-selected variables, and it was found that this new model's out-of-sample accuracy was greatly improved over the previous logistic model. This model has an accuracy of 0.967, a sensitivity of 0.957, and a recall of 0.978. Ultimately, this logistic regression model (with variable selection performed by LASSO) can reliably predict whether a user will click on ad by using the predictors income, age, daily site time, and daily internet time.
 
 
 

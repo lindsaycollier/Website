@@ -1,7 +1,6 @@
 ---
 title: 'Project 1: Exploratory Data Analysis'
 author: "Lindsay Collier"
-date: "October 20, 2019"
 output:
   pdf_document: default
   html_document: default
@@ -20,6 +19,7 @@ library(reshape2)
 library(ggplot2)
 library(knitr)
 library(factoextra)
+library(kableExtra)
 
 billboard <- read.csv("C:/Users/linds/Documents/_SDS 348 Computational Biology/Project 1/billboard_spotify.csv")
 music <- read.csv("C:/Users/linds/Documents/_SDS 348 Computational Biology/Project 1/music_df.csv")
@@ -74,49 +74,55 @@ These dropped observations should be noted, as the final merged dataset thus giv
 
 ##Wrangling
 
-Given the large number of numerical variables in the final datasets, I will be reporting summary statistics for only a few: danceability, energy, acousticness, popularity, valence, and sentiment score.
+Given the large number of numerical variables in the final datasets, I will be reporting summary statistics for only a few: danceability, energy, acousticness, popularity, valence, and sentiment.
+<br></br>
 
 ####Mean and standard deviations of four numeric variables grouped by decade
 
 ```{R,echo=FALSE}
-summary_stats_decade <- billboard_music %>% group_by(decade) %>%
-  summarize("mean danceability"=mean(danceability), sd_danceability=sd(danceability), mean_energy=mean(energy), sd_energy=sd(energy)) %>% round(2)
+#summary_stats_decade 
 
-kable(head(summary_stats_decade))
+billboard_music %>% group_by(decade) %>%
+  summarize("mean danceability"=mean(danceability), "sd danceability"=sd(danceability), "mean energy"=mean(energy), "sd energy"=sd(energy)) %>% round(2) %>% knitr::kable() %>% kable_styling()
 
-summary_stats_decade2 <- billboard_music %>% group_by(decade) %>%
-  summarize(mean_acousticness=mean(acousticness), sd_acousticness=sd(acousticness), mean_valence=mean(valence), sd_valence=sd(valence)) %>% 
-  round(2)
+#kable(head(summary_stats_decade))
 
-kable(head(summary_stats_decade2))
+#summary_stats_decade2 
+
+billboard_music %>% group_by(decade) %>%
+  summarize("mean acousticness"=mean(acousticness), "sd acousticness"=sd(acousticness), "mean valence"=mean(valence), "sd valence"=sd(valence)) %>% round(2) %>% knitr::kable() %>% kable_styling()
+
+#kable(head(summary_stats_decade2))
 ```
 
 Summary statistics reporting mean and standard deviation for four numeric variables can be seen above. 
 
-Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 $\pm$ 0.15 in the 1960s to 0.64 $\pm$ 0.12 in the 2010s. The mean energy score increased from 0.49 $\pm$ 0.2 in the 1960s to 0.72 $\pm$ 0.16 in the 2010s.
+Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 ± 0.15 in the 1960s to 0.64 ± 0.12 in the 2010s. The mean energy score increased from 0.49 ± 0.2 in the 1960s to 0.72 ± 0.16 in the 2010s.
 
-By contrast, the mean acousticness has decreased over time, from 0.53 $\pm$ 0.28 in the 1960s to 0.14 $\pm$ 0.19 in the 2010s. Mean valence has also decreased, though to a lesser degree, from 0.66 $\pm$ 0.23 in the 1960s to 0.53 $\pm$ 0.22 in the 2010s.
+By contrast, the mean acousticness has decreased over time, from 0.53 ± 0.28 in the 1960s to 0.14 ± 0.19 in the 2010s. Mean valence has also decreased, though to a lesser degree, from 0.66 ± 0.23 in the 1960s to 0.53 ± 0.22 in the 2010s.
+<br></br>
 
 ####Song popularity
 
 ```{R,echo=FALSE}
 #Most popular songs
-kable(head(billboard_music %>% group_by(decade) %>% filter(popularity==max(popularity)) %>%
-    select(decade, song, artist, popularity, danceability, energy, valence)))
+head(billboard_music %>% group_by(decade) %>% filter(popularity==max(popularity)) %>%
+    select(decade, song, artist, popularity, danceability, energy, valence)) %>% knitr::kable() %>% kable_styling()
 ```
 
-In each decade, the most popular songs tend to vary in their danceability scores (with a range of 0.491 to 0.781, and a mean of 0.63 $\pm$ 0.10) and their energy scores (with a range of 0.379 to 0.902, and a mean of 0.56 $\pm$ 0.22). 
+In each decade, the most popular songs tend to vary in their danceability scores (with a range of 0.491 to 0.781, and a mean of 0.63 ± 0.10) and their energy scores (with a range of 0.379 to 0.902, and a mean of 0.56 ± 0.22). 
 
-However, popular songs tend to have slightly higher valence -- the average valence of these seven most popular songs is 0.67 $\pm$ 0.28, higher than the dataset average of 0.59 $\pm$ 0.24. 
+However, popular songs tend to have slightly higher valence -- the average valence of these seven most popular songs is 0.67 ± 0.28, higher than the dataset average of 0.59 ± 0.24. 
 
 ```{R,echo=FALSE}
 #Least popular songs
-kable(billboard_music %>% arrange(popularity) %>%
+billboard_music %>% arrange(popularity) %>%
         select(decade,song,artist,popularity,danceability,energy) %>% 
-        head(n=10))
+        head(n=10)%>% knitr::kable() %>% kable_styling()
 ```
 
-The 10 least popular songs of the dataset don't differ much from the most popular songs in terms of their danceability and energy. The mean danceability of the least popular songs is 0.62 $\pm$ 0.15, and the mean energy is 0.63 $\pm$ 0.19. One commonality between the least popular songs is that they tend to be older: nine of the 10 least popular songs are from the 1960s.
+The 10 least popular songs of the dataset don't differ much from the most popular songs in terms of their danceability and energy. The mean danceability of the least popular songs is 0.62 ± 0.15, and the mean energy is 0.63 ± 0.19. One commonality between the least popular songs is that they tend to be older: nine of the 10 least popular songs are from the 1960s.
+<br></br>
 
 ####Song sentiment
 
@@ -135,6 +141,7 @@ billboard_music_sentiment %>% count(sentiment, sort = TRUE) %>% head()
 Using mutate(), I generated a 'sentiment' variable that uses the pos, neg, and neu scores of each song to classify it as 'positive,' 'neutral,' or 'negative.' For instance, if a song's pos score is greater than its neu score and neg score, that song is classified as 'positive,' and so on. 
 
 Of the most popular songs from 1960 to 2015, 99.7% are 'neutral,' and 0.3% are 'positive.' No songs were classified as 'negative.'
+<br></br>
 
 ####Correlation
 
@@ -234,11 +241,12 @@ In general, acousticness has declined greatly over time. Billboard Top 100 songs
 ##Dimensionality Reduction
 
 I conducted Principal Component Analysis on this dataset, focusing on four numeric variables: danceability, energy, acousticness, and valence. 
+<br></br>
 
 ####Preparing the data and computing PCA
 
 Before beginning PCA, the chosen numeric variables were normalized using scale(). PCA was conducted using princomp().
-
+<br></br>
 ```{R,include=FALSE}
 #Preparing the data
 bm_num <- billboard_music %>% 
@@ -271,6 +279,7 @@ ggplot()+geom_bar(aes(y=varprop,x=1:4),stat="identity") + xlab("") +
 ```
 
 The Scree plot above shows the proportion of variance explained by each principal component. Principal component 1 (PC1) and principal component 2 (PC2) together explain 77.83% of the variance in the dataset. This is close to 80%, and thus PC1 and PC2 should be sufficient for this analysis.
+<br></br>
 
 ###Visualizing and interpreting principal components 
 
@@ -296,6 +305,7 @@ PC2 correlates positively with danceability, acousticness, and valence, and corr
 When plotting PC1 versus PC2, there are no clear clusters formed, though there seems to be a larger density of points with large PC1 scores, suggesting that popular songs tend to be lively.
 
 When examining the loadings plot of PC1 and PC2, it can be seen that danceability and valence are correlated (cheerful songs tend to have good rhythm, tempo, and beat strength). However, there are no  strong positive correlations between any of the other variables, though acousticness appears to be negatively correlated with danceability, energy, and valence.
+<br></br>
 
 ####Computing PC scores for notable observations
 

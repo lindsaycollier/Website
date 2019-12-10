@@ -1,12 +1,12 @@
 ---
 title: 'Project 1: Exploratory Data Analysis'
 author: "Lindsay Collier"
-date: "October 20, 2019"
 output:
   pdf_document: default
   html_document: default
 ---
 
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
 
 
 <div id="introduction" class="section level3">
@@ -84,296 +84,666 @@ output:
 </div>
 <div id="wrangling" class="section level2">
 <h2>Wrangling</h2>
-<p>Given the large number of numerical variables in the final datasets, I will be reporting summary statistics for only a few: danceability, energy, acousticness, popularity, valence, and sentiment score.</p>
+<p>Given the large number of numerical variables in the final datasets, I will be reporting summary statistics for only a few: danceability, energy, acousticness, popularity, valence, and sentiment. <br></br></p>
 <div id="mean-and-standard-deviations-of-four-numeric-variables-grouped-by-decade" class="section level4">
 <h4>Mean and standard deviations of four numeric variables grouped by decade</h4>
-<table>
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th align="right">decade</th>
-<th align="right">mean danceability</th>
-<th align="right">sd_danceability</th>
-<th align="right">mean_energy</th>
-<th align="right">sd_energy</th>
+<tr>
+<th style="text-align:right;">
+decade
+</th>
+<th style="text-align:right;">
+mean danceability
+</th>
+<th style="text-align:right;">
+sd danceability
+</th>
+<th style="text-align:right;">
+mean energy
+</th>
+<th style="text-align:right;">
+sd energy
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="right">0.55</td>
-<td align="right">0.15</td>
-<td align="right">0.49</td>
-<td align="right">0.20</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:right;">
+0.55
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.49
+</td>
+<td style="text-align:right;">
+0.20
+</td>
 </tr>
-<tr class="even">
-<td align="right">1970</td>
-<td align="right">0.59</td>
-<td align="right">0.15</td>
-<td align="right">0.57</td>
-<td align="right">0.20</td>
+<tr>
+<td style="text-align:right;">
+1970
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.57
+</td>
+<td style="text-align:right;">
+0.20
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1980</td>
-<td align="right">0.63</td>
-<td align="right">0.15</td>
-<td align="right">0.63</td>
-<td align="right">0.20</td>
+<tr>
+<td style="text-align:right;">
+1980
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+<td style="text-align:right;">
+0.20
+</td>
 </tr>
-<tr class="even">
-<td align="right">1990</td>
-<td align="right">0.64</td>
-<td align="right">0.15</td>
-<td align="right">0.63</td>
-<td align="right">0.18</td>
+<tr>
+<td style="text-align:right;">
+1990
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+<td style="text-align:right;">
+0.18
+</td>
 </tr>
-<tr class="odd">
-<td align="right">2000</td>
-<td align="right">0.65</td>
-<td align="right">0.15</td>
-<td align="right">0.70</td>
-<td align="right">0.15</td>
+<tr>
+<td style="text-align:right;">
+2000
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.70
+</td>
+<td style="text-align:right;">
+0.15
+</td>
 </tr>
-<tr class="even">
-<td align="right">2010</td>
-<td align="right">0.64</td>
-<td align="right">0.12</td>
-<td align="right">0.72</td>
-<td align="right">0.16</td>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+<td style="text-align:right;">
+0.12
+</td>
+<td style="text-align:right;">
+0.72
+</td>
+<td style="text-align:right;">
+0.16
+</td>
 </tr>
 </tbody>
 </table>
-<table>
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th align="right">decade</th>
-<th align="right">mean_acousticness</th>
-<th align="right">sd_acousticness</th>
-<th align="right">mean_valence</th>
-<th align="right">sd_valence</th>
+<tr>
+<th style="text-align:right;">
+decade
+</th>
+<th style="text-align:right;">
+mean acousticness
+</th>
+<th style="text-align:right;">
+sd acousticness
+</th>
+<th style="text-align:right;">
+mean valence
+</th>
+<th style="text-align:right;">
+sd valence
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="right">0.52</td>
-<td align="right">0.28</td>
-<td align="right">0.66</td>
-<td align="right">0.23</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:right;">
+0.52
+</td>
+<td style="text-align:right;">
+0.28
+</td>
+<td style="text-align:right;">
+0.66
+</td>
+<td style="text-align:right;">
+0.23
+</td>
 </tr>
-<tr class="even">
-<td align="right">1970</td>
-<td align="right">0.34</td>
-<td align="right">0.26</td>
-<td align="right">0.65</td>
-<td align="right">0.24</td>
+<tr>
+<td style="text-align:right;">
+1970
+</td>
+<td style="text-align:right;">
+0.34
+</td>
+<td style="text-align:right;">
+0.26
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+0.24
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1980</td>
-<td align="right">0.24</td>
-<td align="right">0.23</td>
-<td align="right">0.62</td>
-<td align="right">0.25</td>
+<tr>
+<td style="text-align:right;">
+1980
+</td>
+<td style="text-align:right;">
+0.24
+</td>
+<td style="text-align:right;">
+0.23
+</td>
+<td style="text-align:right;">
+0.62
+</td>
+<td style="text-align:right;">
+0.25
+</td>
 </tr>
-<tr class="even">
-<td align="right">1990</td>
-<td align="right">0.21</td>
-<td align="right">0.22</td>
-<td align="right">0.56</td>
-<td align="right">0.24</td>
+<tr>
+<td style="text-align:right;">
+1990
+</td>
+<td style="text-align:right;">
+0.21
+</td>
+<td style="text-align:right;">
+0.22
+</td>
+<td style="text-align:right;">
+0.56
+</td>
+<td style="text-align:right;">
+0.24
+</td>
 </tr>
-<tr class="odd">
-<td align="right">2000</td>
-<td align="right">0.15</td>
-<td align="right">0.19</td>
-<td align="right">0.57</td>
-<td align="right">0.23</td>
+<tr>
+<td style="text-align:right;">
+2000
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.57
+</td>
+<td style="text-align:right;">
+0.23
+</td>
 </tr>
-<tr class="even">
-<td align="right">2010</td>
-<td align="right">0.14</td>
-<td align="right">0.19</td>
-<td align="right">0.53</td>
-<td align="right">0.22</td>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.53
+</td>
+<td style="text-align:right;">
+0.22
+</td>
 </tr>
 </tbody>
 </table>
 <p>Summary statistics reporting mean and standard deviation for four numeric variables can be seen above.</p>
-<p>Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 <span class="math inline">\(\pm\)</span> 0.15 in the 1960s to 0.64 <span class="math inline">\(\pm\)</span> 0.12 in the 2010s. The mean energy score increased from 0.49 <span class="math inline">\(\pm\)</span> 0.2 in the 1960s to 0.72 <span class="math inline">\(\pm\)</span> 0.16 in the 2010s.</p>
-<p>By contrast, the mean acousticness has decreased over time, from 0.53 <span class="math inline">\(\pm\)</span> 0.28 in the 1960s to 0.14 <span class="math inline">\(\pm\)</span> 0.19 in the 2010s. Mean valence has also decreased, though to a lesser degree, from 0.66 <span class="math inline">\(\pm\)</span> 0.23 in the 1960s to 0.53 <span class="math inline">\(\pm\)</span> 0.22 in the 2010s.</p>
+<p>Generally, the mean danceability and energy of the most popular songs have increased by decade. The mean danceability score increased from 0.55 ± 0.15 in the 1960s to 0.64 ± 0.12 in the 2010s. The mean energy score increased from 0.49 ± 0.2 in the 1960s to 0.72 ± 0.16 in the 2010s.</p>
+<p>By contrast, the mean acousticness has decreased over time, from 0.53 ± 0.28 in the 1960s to 0.14 ± 0.19 in the 2010s. Mean valence has also decreased, though to a lesser degree, from 0.66 ± 0.23 in the 1960s to 0.53 ± 0.22 in the 2010s. <br></br></p>
 </div>
 <div id="song-popularity" class="section level4">
 <h4>Song popularity</h4>
-<table>
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th align="right">decade</th>
-<th align="left">song</th>
-<th align="left">artist</th>
-<th align="right">popularity</th>
-<th align="right">danceability</th>
-<th align="right">energy</th>
-<th align="right">valence</th>
+<tr>
+<th style="text-align:right;">
+decade
+</th>
+<th style="text-align:left;">
+song
+</th>
+<th style="text-align:left;">
+artist
+</th>
+<th style="text-align:right;">
+popularity
+</th>
+<th style="text-align:right;">
+danceability
+</th>
+<th style="text-align:right;">
+energy
+</th>
+<th style="text-align:right;">
+valence
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="left">brown eyed girl</td>
-<td align="left">van morrison</td>
-<td align="right">79</td>
-<td align="right">0.491</td>
-<td align="right">0.583</td>
-<td align="right">0.907</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+brown eyed girl
+</td>
+<td style="text-align:left;">
+van morrison
+</td>
+<td style="text-align:right;">
+79
+</td>
+<td style="text-align:right;">
+0.491
+</td>
+<td style="text-align:right;">
+0.583
+</td>
+<td style="text-align:right;">
+0.907
+</td>
 </tr>
-<tr class="even">
-<td align="right">1970</td>
-<td align="left">september</td>
-<td align="left">earth, wind and fire</td>
-<td align="right">80</td>
-<td align="right">0.697</td>
-<td align="right">0.809</td>
-<td align="right">0.980</td>
+<tr>
+<td style="text-align:right;">
+1970
+</td>
+<td style="text-align:left;">
+september
+</td>
+<td style="text-align:left;">
+earth, wind and fire
+</td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:right;">
+0.697
+</td>
+<td style="text-align:right;">
+0.809
+</td>
+<td style="text-align:right;">
+0.980
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1980</td>
-<td align="left">take on me</td>
-<td align="left">a-ha</td>
-<td align="right">83</td>
-<td align="right">0.573</td>
-<td align="right">0.902</td>
-<td align="right">0.876</td>
+<tr>
+<td style="text-align:right;">
+1980
+</td>
+<td style="text-align:left;">
+take on me
+</td>
+<td style="text-align:left;">
+a-ha
+</td>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+0.573
+</td>
+<td style="text-align:right;">
+0.902
+</td>
+<td style="text-align:right;">
+0.876
+</td>
 </tr>
-<tr class="even">
-<td align="right">1990</td>
-<td align="left">under the bridge</td>
-<td align="left">red hot chili peppers</td>
-<td align="right">82</td>
-<td align="right">0.559</td>
-<td align="right">0.345</td>
-<td align="right">0.458</td>
+<tr>
+<td style="text-align:right;">
+1990
+</td>
+<td style="text-align:left;">
+under the bridge
+</td>
+<td style="text-align:left;">
+red hot chili peppers
+</td>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+0.559
+</td>
+<td style="text-align:right;">
+0.345
+</td>
+<td style="text-align:right;">
+0.458
+</td>
 </tr>
-<tr class="odd">
-<td align="right">2000</td>
-<td align="left">i’m yours</td>
-<td align="left">jason mraz</td>
-<td align="right">84</td>
-<td align="right">0.686</td>
-<td align="right">0.457</td>
-<td align="right">0.718</td>
+<tr>
+<td style="text-align:right;">
+2000
+</td>
+<td style="text-align:left;">
+i’m yours
+</td>
+<td style="text-align:left;">
+jason mraz
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+0.686
+</td>
+<td style="text-align:right;">
+0.457
+</td>
+<td style="text-align:right;">
+0.718
+</td>
 </tr>
-<tr class="even">
-<td align="right">2010</td>
-<td align="left">thinking out loud</td>
-<td align="left">ed sheeran</td>
-<td align="right">85</td>
-<td align="right">0.781</td>
-<td align="right">0.445</td>
-<td align="right">0.591</td>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:left;">
+thinking out loud
+</td>
+<td style="text-align:left;">
+ed sheeran
+</td>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+0.781
+</td>
+<td style="text-align:right;">
+0.445
+</td>
+<td style="text-align:right;">
+0.591
+</td>
 </tr>
 </tbody>
 </table>
-<p>In each decade, the most popular songs tend to vary in their danceability scores (with a range of 0.491 to 0.781, and a mean of 0.63 <span class="math inline">\(\pm\)</span> 0.10) and their energy scores (with a range of 0.379 to 0.902, and a mean of 0.56 <span class="math inline">\(\pm\)</span> 0.22).</p>
-<p>However, popular songs tend to have slightly higher valence – the average valence of these seven most popular songs is 0.67 <span class="math inline">\(\pm\)</span> 0.28, higher than the dataset average of 0.59 <span class="math inline">\(\pm\)</span> 0.24.</p>
-<table>
+<p>In each decade, the most popular songs tend to vary in their danceability scores (with a range of 0.491 to 0.781, and a mean of 0.63 ± 0.10) and their energy scores (with a range of 0.379 to 0.902, and a mean of 0.56 ± 0.22).</p>
+<p>However, popular songs tend to have slightly higher valence – the average valence of these seven most popular songs is 0.67 ± 0.28, higher than the dataset average of 0.59 ± 0.24.</p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
-<tr class="header">
-<th align="right">decade</th>
-<th align="left">song</th>
-<th align="left">artist</th>
-<th align="right">popularity</th>
-<th align="right">danceability</th>
-<th align="right">energy</th>
+<tr>
+<th style="text-align:right;">
+decade
+</th>
+<th style="text-align:left;">
+song
+</th>
+<th style="text-align:left;">
+artist
+</th>
+<th style="text-align:right;">
+popularity
+</th>
+<th style="text-align:right;">
+danceability
+</th>
+<th style="text-align:right;">
+energy
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="left">funny way of laughin’</td>
-<td align="left">burl ives</td>
-<td align="right">0</td>
-<td align="right">0.438</td>
-<td align="right">0.0872</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+funny way of laughin’
+</td>
+<td style="text-align:left;">
+burl ives
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.438
+</td>
+<td style="text-align:right;">
+0.0872
+</td>
 </tr>
-<tr class="even">
-<td align="right">1960</td>
-<td align="left">i’m gonna make you mine</td>
-<td align="left">lou christie</td>
-<td align="right">5</td>
-<td align="right">0.565</td>
-<td align="right">0.9000</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+i’m gonna make you mine
+</td>
+<td style="text-align:left;">
+lou christie
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0.565
+</td>
+<td style="text-align:right;">
+0.9000
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="left">go jimmy go</td>
-<td align="left">jimmy clanton</td>
-<td align="right">6</td>
-<td align="right">0.684</td>
-<td align="right">0.3740</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+go jimmy go
+</td>
+<td style="text-align:left;">
+jimmy clanton
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0.684
+</td>
+<td style="text-align:right;">
+0.3740
+</td>
 </tr>
-<tr class="even">
-<td align="right">1960</td>
-<td align="left">it keeps right on a-hurtin’</td>
-<td align="left">johnny tillotson</td>
-<td align="right">9</td>
-<td align="right">0.423</td>
-<td align="right">0.3120</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+it keeps right on a-hurtin’
+</td>
+<td style="text-align:left;">
+johnny tillotson
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0.423
+</td>
+<td style="text-align:right;">
+0.3120
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="left">busted</td>
-<td align="left">ray charles</td>
-<td align="right">9</td>
-<td align="right">0.917</td>
-<td align="right">0.4660</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+busted
+</td>
+<td style="text-align:left;">
+ray charles
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0.917
+</td>
+<td style="text-align:right;">
+0.4660
+</td>
 </tr>
-<tr class="even">
-<td align="right">1960</td>
-<td align="left">painted, tainted rose</td>
-<td align="left">al martino</td>
-<td align="right">9</td>
-<td align="right">0.348</td>
-<td align="right">0.3090</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+painted, tainted rose
+</td>
+<td style="text-align:left;">
+al martino
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0.348
+</td>
+<td style="text-align:right;">
+0.3090
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1980</td>
-<td align="left">what are we doin’ in love</td>
-<td align="left">dottie west</td>
-<td align="right">10</td>
-<td align="right">0.529</td>
-<td align="right">0.4970</td>
+<tr>
+<td style="text-align:right;">
+1980
+</td>
+<td style="text-align:left;">
+what are we doin’ in love
+</td>
+<td style="text-align:left;">
+dottie west
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.529
+</td>
+<td style="text-align:right;">
+0.4970
+</td>
 </tr>
-<tr class="even">
-<td align="right">1960</td>
-<td align="left">you’re the reason i’m living</td>
-<td align="left">bobby darin</td>
-<td align="right">11</td>
-<td align="right">0.430</td>
-<td align="right">0.2040</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+you’re the reason i’m living
+</td>
+<td style="text-align:left;">
+bobby darin
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+0.430
+</td>
+<td style="text-align:right;">
+0.2040
+</td>
 </tr>
-<tr class="odd">
-<td align="right">1960</td>
-<td align="left">venus in blue jeans</td>
-<td align="left">jimmy clanton</td>
-<td align="right">12</td>
-<td align="right">0.514</td>
-<td align="right">0.3810</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+venus in blue jeans
+</td>
+<td style="text-align:left;">
+jimmy clanton
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+0.514
+</td>
+<td style="text-align:right;">
+0.3810
+</td>
 </tr>
-<tr class="even">
-<td align="right">1960</td>
-<td align="left">the shelter of your arms</td>
-<td align="left">sammy davis jr.</td>
-<td align="right">12</td>
-<td align="right">0.536</td>
-<td align="right">0.3310</td>
+<tr>
+<td style="text-align:right;">
+1960
+</td>
+<td style="text-align:left;">
+the shelter of your arms
+</td>
+<td style="text-align:left;">
+sammy davis jr.
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+0.536
+</td>
+<td style="text-align:right;">
+0.3310
+</td>
 </tr>
 </tbody>
 </table>
-<p>The 10 least popular songs of the dataset don’t differ much from the most popular songs in terms of their danceability and energy. The mean danceability of the least popular songs is 0.62 <span class="math inline">\(\pm\)</span> 0.15, and the mean energy is 0.63 <span class="math inline">\(\pm\)</span> 0.19. One commonality between the least popular songs is that they tend to be older: nine of the 10 least popular songs are from the 1960s.</p>
+<p>The 10 least popular songs of the dataset don’t differ much from the most popular songs in terms of their danceability and energy. The mean danceability of the least popular songs is 0.62 ± 0.15, and the mean energy is 0.63 ± 0.19. One commonality between the least popular songs is that they tend to be older: nine of the 10 least popular songs are from the 1960s. <br></br></p>
 </div>
 <div id="song-sentiment" class="section level4">
 <h4>Song sentiment</h4>
 <p>Using mutate(), I generated a ‘sentiment’ variable that uses the pos, neg, and neu scores of each song to classify it as ‘positive,’ ‘neutral,’ or ‘negative.’ For instance, if a song’s pos score is greater than its neu score and neg score, that song is classified as ‘positive,’ and so on.</p>
-<p>Of the most popular songs from 1960 to 2015, 99.7% are ‘neutral,’ and 0.3% are ‘positive.’ No songs were classified as ‘negative.’</p>
+<p>Of the most popular songs from 1960 to 2015, 99.7% are ‘neutral,’ and 0.3% are ‘positive.’ No songs were classified as ‘negative.’ <br></br></p>
 </div>
 <div id="correlation" class="section level4">
 <h4>Correlation</h4>
@@ -400,16 +770,16 @@ output:
 </div>
 <div id="dimensionality-reduction" class="section level2">
 <h2>Dimensionality Reduction</h2>
-<p>I conducted Principal Component Analysis on this dataset, focusing on four numeric variables: danceability, energy, acousticness, and valence.</p>
+<p>I conducted Principal Component Analysis on this dataset, focusing on four numeric variables: danceability, energy, acousticness, and valence. <br></br></p>
 <div id="preparing-the-data-and-computing-pca" class="section level4">
 <h4>Preparing the data and computing PCA</h4>
-<p>Before beginning PCA, the chosen numeric variables were normalized using scale(). PCA was conducted using princomp().</p>
+<p>Before beginning PCA, the chosen numeric variables were normalized using scale(). PCA was conducted using princomp(). <br></br></p>
 </div>
 <div id="choosing-principal-components" class="section level4">
 <h4>Choosing principal components</h4>
 <p>The proportional variance for each principal component was computed by first squaring the standard deviation outputs, and then dividing each variance by the total variance. To visualize the proportional variance of each principal component, a Scree plot was generated.</p>
 <p><img src="/Project1_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p>The Scree plot above shows the proportion of variance explained by each principal component. Principal component 1 (PC1) and principal component 2 (PC2) together explain 77.83% of the variance in the dataset. This is close to 80%, and thus PC1 and PC2 should be sufficient for this analysis.</p>
+<p>The Scree plot above shows the proportion of variance explained by each principal component. Principal component 1 (PC1) and principal component 2 (PC2) together explain 77.83% of the variance in the dataset. This is close to 80%, and thus PC1 and PC2 should be sufficient for this analysis. <br></br></p>
 </div>
 <div id="visualizing-and-interpreting-principal-components" class="section level3">
 <h3>Visualizing and interpreting principal components</h3>
@@ -418,7 +788,7 @@ output:
 <p>PC1 correlates positively with danceability, energy, and valence, and correlates negatively with acousticness. PC1 can thus be interpreted as a general ‘liveliness’ score. Songs with a large PC1 score tend to be primarily electronic, cheerful, energetic, and easy to dance to. Songs with a low PC2 score tend to be acoustic, sad, and low energy with a slow tempo.</p>
 <p>PC2 correlates positively with danceability, acousticness, and valence, and correlates negatively with energy. PC2 can be interpreted as a ‘mood’ score. Songs with a large PC2 score tend to be acoustic, low energy, have good beats and rhythm, and be cheerful. Conversely, songs with low PC2 scores tend to convey negativity, and be electronic, intense, and hard to dance to.</p>
 <p>When plotting PC1 versus PC2, there are no clear clusters formed, though there seems to be a larger density of points with large PC1 scores, suggesting that popular songs tend to be lively.</p>
-<p>When examining the loadings plot of PC1 and PC2, it can be seen that danceability and valence are correlated (cheerful songs tend to have good rhythm, tempo, and beat strength). However, there are no strong positive correlations between any of the other variables, though acousticness appears to be negatively correlated with danceability, energy, and valence.</p>
+<p>When examining the loadings plot of PC1 and PC2, it can be seen that danceability and valence are correlated (cheerful songs tend to have good rhythm, tempo, and beat strength). However, there are no strong positive correlations between any of the other variables, though acousticness appears to be negatively correlated with danceability, energy, and valence. <br></br></p>
 <div id="computing-pc-scores-for-notable-observations" class="section level4">
 <h4>Computing PC scores for notable observations</h4>
 <p>The three songs with the highest PC1 scores are “I’ve Got to Use My Imagination” by Gladys Knight and the Pips, “Wanna be Startin’ Somethin’” by Michael Jackson, and “Move This” by Technotronic. These are the ‘liveliest’ songs in the dataset: they have high danceability, energy, and valence, and low acousticness.</p>

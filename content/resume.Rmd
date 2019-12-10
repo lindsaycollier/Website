@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 <center> [Email](mailto:lindsay.collier@utexas.edu) | [LinkedIn](https://www.linkedin.com/in/lindsay-collier) </center>
-update
 
 <center> <h3>**Education**</h3> </center>
 

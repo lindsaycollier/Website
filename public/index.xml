@@ -79,7 +79,7 @@ To conduct this analysis, I am using two datasets that list unique musical chara
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/project2/</guid>
-      <description>IntroductionFor this project, I will be using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, ad, contains the binary response variable ‘clicked on ad,’ quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender.</description>
+      <description>IntroductionFor this project, I will be building a predictive model using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, ad, contains the binary response variable ‘clicked on ad,’ quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender.</description>
     </item>
     
     <item>
