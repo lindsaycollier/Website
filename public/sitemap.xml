@@ -48,6 +48,11 @@
   </url>
   
   <url>
+    <loc>/projects.nb/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>/resume/</loc>
   </url>
   
@@ -57,6 +62,10 @@
   
   <url>
     <loc>/project2/</loc>
+  </url>
+  
+  <url>
+    <loc>/projects/</loc>
   </url>
   
 </urlset>

@@ -10,19 +10,19 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-<center> [Email](mailto:lindsay.collier@utexas.edu) | [LinkedIn](linkedin.com/in/lindsay-collier) </center>
+<center> [Email](mailto:lindsay.collier@utexas.edu) | [LinkedIn](https://www.linkedin.com/in/lindsay-collier) </center>
 
 
-<center> <h3>Education</h3> </center>
+<center> <h3>**Education**</h3> </center>
 
 **Bachelor of Science in Cellular and Molecular Biology**
 
 **Certificate in Applied Statistical Modeling**
 
-The University of Texas at Austin @ Austin, TX -- September 2016 to May 2020
+_The University of Texas at Austin @ Austin, TX_ -- September 2016 to May 2020
 
 
-<center> <h3>Skills</h3> </center>
+<center> <h3>**Skills**</h3> </center>
 
 **Molecular Biology**: Next Generation Sequencing, PCR and qPCR, DNA isolation, agarose and polyacrylamide gel electrophoresis, molecular cloning, bacterial cell transformation, protein purification, western blots, microscopy
 
@@ -30,7 +30,7 @@ The University of Texas at Austin @ Austin, TX -- September 2016 to May 2020
 
 **Computer/Technical**: R, Microsoft Office (Word, Excel, Powerpoint)
 
-<center> <h3>Experience</h3> </center>
+<center> <h3>**Experience**</h3> </center>
 
 **Research Intern**
 

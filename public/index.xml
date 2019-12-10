@@ -42,6 +42,15 @@
     </item>
     
     <item>
+      <title></title>
+      <link>/projects.nb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects.nb/</guid>
+      <description>Projectscode{white-space: pre;}pre:not([class]) {background-color: white;}if (window.hljs) {hljs.configure({languages: []});hljs.initHighlightingOnLoad();if (document.readyState &amp;&amp; document.readyState === &#34;complete&#34;) {window.setTimeout(function() { hljs.initHighlighting(); }, 0);}}h1 {font-size: 34px;}h1.title {font-size: 38px;}h2 {font-size: 30px;}h3 {font-size: 24px;}h4 {font-size: 18px;}h5 {font-size: 16px;}h6 {font-size: 12px;}.</description>
+    </item>
+    
+    <item>
       <title>Lindsay Collier</title>
       <link>/resume/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -71,6 +80,16 @@ To conduct this analysis, I am using two datasets that list unique musical chara
       
       <guid>/project2/</guid>
       <description>IntroductionFor this project, I will be using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, ad, contains the binary response variable ‘clicked on ad,’ quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender.</description>
+    </item>
+    
+    <item>
+      <title>Projects</title>
+      <link>/projects/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/</guid>
+      <description>In these projects, I utilize R and various R packages (ggplot, tidyverse, dplyr) to perform data analysis and build predictive models. 
+Project 1This project is an exploratory data analysis of 55 years’ worth of Billboard Top 100 songs. I used R’s tidyverse and ggplot packages to organize and visualize the data. By combining the Billboard Top 100 charts with song metrics sourced from Spotify, I strove to discover what makes a song ‘popular,’ and how music preferences have changed over the past half century.</description>
     </item>
     
   </channel>
