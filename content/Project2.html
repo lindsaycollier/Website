@@ -1,0 +1,487 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "Lindsay Collier (lmc3746)"
+date: "November 26, 2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>For this project, I will be using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, <em>ad</em>, contains the binary response variable ‘clicked on ad,’ quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">clicked</th>
+<th align="left">gender</th>
+<th align="right">age</th>
+<th align="right">income</th>
+<th align="right">daily_site_time</th>
+<th align="right">daily_internet_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">female</td>
+<td align="right">35</td>
+<td align="right">61833.90</td>
+<td align="right">68.95</td>
+<td align="right">256.09</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">male</td>
+<td align="right">31</td>
+<td align="right">68441.85</td>
+<td align="right">80.23</td>
+<td align="right">193.77</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">female</td>
+<td align="right">26</td>
+<td align="right">59785.94</td>
+<td align="right">69.47</td>
+<td align="right">236.50</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">male</td>
+<td align="right">29</td>
+<td align="right">54806.18</td>
+<td align="right">74.15</td>
+<td align="right">245.89</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">female</td>
+<td align="right">35</td>
+<td align="right">73889.99</td>
+<td align="right">68.37</td>
+<td align="right">225.58</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">male</td>
+<td align="right">23</td>
+<td align="right">59761.56</td>
+<td align="right">59.99</td>
+<td align="right">226.74</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="testing-variables" class="section level3">
+<h3>Testing Variables</h3>
+<pre class="r"><code>#MANOVA
+manova &lt;- manova(cbind(daily_site_time,age,income,daily_internet_time)~clicked, data = ad)
+
+summary(manova)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## clicked 1 0.82322 1158.4 4 995 &lt; 2.2e-16 ***
+## Residuals 998
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#univariate ANOVAs
+summary.aov(manova)</code></pre>
+<pre><code>## Response daily_site_time :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## clicked 1 140527 140527 1268.5 &lt; 2.2e-16 ***
+## Residuals 998 110558 111
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response age :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## clicked 1 18706 18705.6 319.64 &lt; 2.2e-16 ***
+## Residuals 998 58403 58.5
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response income :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## clicked 1 4.0776e+10 4.0776e+10 292.77 &lt; 2.2e-16 ***
+## Residuals 998 1.3900e+11 1.3928e+08
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response daily_internet_time :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## clicked 1 1191191 1191191 1619 &lt; 2.2e-16 ***
+## Residuals 998 734297 736
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#post-hoc t-tests
+pairwise.t.test(ad$daily_site_time, ad$clicked, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  ad$daily_site_time and ad$clicked 
+## 
+##   0     
+## 1 &lt;2e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(ad$age, ad$clicked, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  ad$age and ad$clicked 
+## 
+##   0     
+## 1 &lt;2e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(ad$income, ad$clicked, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  ad$income and ad$clicked 
+## 
+##   0     
+## 1 &lt;2e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(ad$daily_internet_time, ad$clicked, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  ad$daily_internet_time and ad$clicked 
+## 
+##   0     
+## 1 &lt;2e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#type I error
+1-(1-0.05)^9</code></pre>
+<pre><code>## [1] 0.3697506</code></pre>
+<pre class="r"><code>#checking assumption: multivariate normality (using scaled version of dataset)
+ggplot(ad_scale, aes(x = daily_site_time, y = age)) +
+ geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~clicked)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(ad_scale, aes(x = daily_site_time, y = daily_internet_time)) +
+ geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~clicked)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(ad_scale, aes(x = daily_site_time, y = income)) +
+ geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~clicked)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#checking assumption: homogenous covariances (using scaled version of dataset)
+covmats &lt;- ad_scale %&gt;% group_by(clicked) %&gt;% do(covs=cov(.[1:4]))
+for(i in 1:2){print(covmats$covs[i])}</code></pre>
+<pre><code>## [[1]]
+## income daily_site_time age daily_internet_time
+## income 0.44057365 -0.09756361 0.12917789 -0.06658290
+## daily_site_time -0.09756361 0.22740008 0.08442527
+-0.04512763
+## age 0.12917789 0.08442527 0.50010746 0.07966726
+## daily_internet_time -0.06658290 -0.04512763 0.07966726
+0.29572562
+##
+## [[1]]
+## income daily_site_time age daily_internet_time
+## income 1.107338875 0.006793622 -0.02514308 -0.007686224
+## daily_site_time 0.006793622 0.654125540 -0.01043630
+-0.094541203
+## age -0.025143076 -0.010436296 1.01623631 -0.039253653
+## daily_internet_time -0.007686224 -0.094541203
+-0.03925365 0.467750867</code></pre>
+<p>The results of the MANOVA show that there are significant differences in the four dependent measures (daily time spent on site, daily internet usage, area income, and age) across the two levels of the “clicked on ad” variable, with a p-value &lt;0.05.</p>
+<p>Univariate ANOVAs were performed on each of the four dependent variables. All four responses showed significant mean differences across the two groups of the “clicked on ad” variable, with a p-value &lt;0.05. Post hoc analysis of these four variables was consistent with the univariate ANOVAs, in that each response variable was shown to significantly differ across the binary groups (0 or 1) of the “clicked on ad” variable.</p>
+<p>For this analysis, 9 tests were performed (1 MANOVA, 4 ANOVAs, and 4 t-tests). The probability of type I error is 36.98%. The Bonferroni correction is thus 0.05/9 = 0.0056. Even after incorporating this Bonferroni adjustment, each numeric variable differs significantly across the two levels of the “clicked on ad” variable.</p>
+<p>There is relative multivariate normality among the response variables, and there seems to be homogenous covariances among the groups.</p>
+</div>
+<div id="randomization-test" class="section level3">
+<h3>Randomization Test</h3>
+<pre class="r"><code>#compute observed F
+distances &lt;- ad %&gt;% select(daily_site_time,age,income,daily_internet_time) %&gt;% dist()
+
+SST &lt;- sum(distances^2)/1000 
+SSW &lt;- ad %&gt;% group_by(clicked) %&gt;% select(daily_site_time,age,income,daily_internet_time) %&gt;% 
+  do(d = dist(.[2:5], &quot;euclidean&quot;)) %&gt;% ungroup() %&gt;% 
+  summarize(sum(d[[1]]^2)/500 + sum(d[[2]]^2)/500) %&gt;% pull 
+
+F_obs &lt;- ((SST-SSW)/1)/(SSW/998)
+
+# compute null distribution for F
+Fs &lt;- replicate(1000,{
+new &lt;- ad %&gt;% mutate(clicked=sample(clicked)) #permute the species vector
+SSW &lt;- new %&gt;% group_by(clicked) %&gt;% select(daily_site_time,age,income,daily_internet_time) %&gt;% 
+  do(d=dist(.[2:5], &quot;euclidean&quot;)) %&gt;% ungroup() %&gt;% 
+  summarize(sum(d[[1]]^2)/500 + sum(d[[2]]^2)/500) %&gt;% pull
+
+((SST-SSW)/1)/(SSW/998) 
+})
+
+#histogram of null distribution
+hist(Fs,prob=T)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#histogram that visualizes observed F
+hist(Fs,prob = T,breaks=seq(0, 300, by=5), xlim=c(0,300), xaxt=&quot;n&quot;)
+axis(1, at=c(0,300), labels=c(&quot;&quot;,&quot;&quot;), lwd.ticks=0)
+axis(1, at=seq(0 , 300, by=5), lwd=0, lwd.ticks=1)
+abline(v=F_obs, col=&quot;red&quot;, add=T) </code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#confirming results
+adonis(distances ~ clicked, data = ad)</code></pre>
+<pre><code>##
+## Call:
+## adonis(formula = distances ~ clicked, data = ad)
+##
+## Permutation: free
+## Number of permutations: 999
+##
+## Terms added sequentially (first to last)
+##
+## Df SumsOfSqs MeanSqs F.Model R2 Pr(&gt;F)
+## clicked 1 4.0777e+10 4.0777e+10 292.78 0.22682 0.001 ***
+## Residuals 998 1.3900e+11 1.3928e+08 0.77318
+## Total 999 1.7977e+11 1.00000
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<p>I performed a randomization MANOVA test on this data and tested the following null hypothesis:</p>
+<p>H<sub>0</sub>: Whether a user clicked on an ad does not vary by age, income, daily time spent on a site, and daily time spent on the internet.</p>
+<p>H<sub>A</sub>: Whether a user clicked on an ad does vary by age, income, daily time spent on a site, and daily time spent on the internet.</p>
+<p>The observed F-value is significantly larger than the null distribution. As such, I can conclude that the response variable (‘clicked’) varies significantly by the descriptive variables analyzed here (age, income, daily time spent on a site, and daily time spent on the internet).</p>
+<p>I confirmed these results with adonis().</p>
+</div>
+<div id="linear-regression-model" class="section level3">
+<h3>Linear Regression Model</h3>
+<pre class="r"><code>#mean-centering numeric variables 
+ad &lt;- ad %&gt;% mutate(income = scale(income, scale=FALSE), age = scale(age, scale=FALSE),
+                    daily_site_time = scale(daily_site_time, scale=FALSE), 
+                    daily_internet_time = scale(daily_internet_time, scale=FALSE))
+
+#linear regression model
+linear &lt;- lm(daily_site_time ~ income*gender, data = ad)
+summary(linear)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = daily_site_time ~ income * gender, data =
+ad)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -32.10 -11.88 1.48 12.30 32.43
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 2.953e-01 6.622e-01 0.446 0.656
+## income 3.622e-04 4.774e-05 7.587 7.47e-14 ***
+## gendermale -6.141e-01 9.549e-01 -0.643 0.520
+## income:gendermale 1.196e-05 7.161e-05 0.167 0.867
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 15.09 on 996 degrees of freedom
+## Multiple R-squared: 0.09709, Adjusted R-squared: 0.09437
+## F-statistic: 35.7 on 3 and 996 DF, p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ggplot(ad, aes(x=income, y=daily_site_time, color=gender)) + geom_point() + 
+  geom_smooth(method = &quot;lm&quot;) + ylab(&quot;Daily Time Spent on Site&quot;) + xlab(&quot;Income&quot;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#checking assumptions: homoskedasticity
+bptest(linear) </code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  linear
+## BP = 22.925, df = 3, p-value = 4.186e-05</code></pre>
+<pre class="r"><code>#checking assumptions: linearity
+residuals&lt;-linear$residuals
+fitted_values&lt;-linear$fitted.values
+ggplot()+geom_point(aes(fitted_values,residuals))+geom_hline(yintercept=0, color=&#39;red&#39;) </code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#checking assumptions: normality
+qqnorm(ad$daily_site_time, pch = 1, frame = FALSE) 
+qqline(ad$daily_site_time, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#robust standard errors
+coeftest(linear, vcov = vcovHC(linear)) </code></pre>
+<pre><code>##
+## t test of coefficients:
+##
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 2.9527e-01 6.5071e-01 0.4538 0.6501
+## income 3.6220e-04 4.0383e-05 8.9693 &lt;2e-16 ***
+## gendermale -6.1409e-01 9.5775e-01 -0.6412 0.5216
+## income:gendermale 1.1962e-05 6.2122e-05 0.1926 0.8473
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<p>I built a linear model predicting daily time spent on a site by area income and gender. After running the linear model, the coefficient estimate for the income variable, <span class="math inline">\(\beta_1\)</span>, is <span class="math inline">\(3.6*10^{-4}\)</span>, the coefficient estimate for the gender variable, <span class="math inline">\(\beta_2\)</span>, is -1.27, and the coefficient estimate for the interaction between income and gender, <span class="math inline">\(\beta_3\)</span>, is <span class="math inline">\(1.2*10^{-5}\)</span>.</p>
+<p>For males, for each unit increase in income, the average daily time spent on a site increases by <span class="math inline">\(\beta_1\)</span>+<span class="math inline">\(\beta_3\)</span> = <span class="math inline">\(3.72*10^{-4}\)</span>. For females, for each unit increase in income, the average daily time spent on a site increases by <span class="math inline">\(3.6*10^{-4}\)</span>. Additionally, males’ average daily time spent on a site is 1.27 units less than females’.</p>
+<p>To test the homoskedasticity assumption, I performed a Breusch-Pagan test, and computed a p-value &lt; 0.05. Thus, the null hypothesis of homoskedasticity is rejected, and the data is heteroskedastic. To test the linearity assumption, I plotted the fitted values against the residuals, and concluded that the data was not scattered randomly arround the mean, and thus the data is not linear. Finally, to test the normality assumption, I plotted a qq-plot and concluded that the data is not normally distributed.</p>
+<p>After re-running the regression results with robust standard errors, the significance of the analyzed variables did not change. The income variable was found to have a significant positive relationship with daily time spent on a site. Gender and the interaction between gender and income were not found to be significant. The proportion of variation in the outcome explained by this linear model is 9.7%.</p>
+</div>
+<div id="linear-regression-model-with-bootstrapped-standard-errors" class="section level3">
+<h3>Linear Regression Model with Bootstrapped Standard Errors</h3>
+<pre class="r"><code>#bootstrapped standard errors
+linear_sample1 &lt;- replicate(5000, {
+  linear_boot &lt;- ad[sample(nrow(ad), replace=TRUE),]
+  linear &lt;- lm(daily_site_time ~ income*gender, data = linear_boot)
+  coeftest(linear)[,2] 
+})
+
+linear_sample1 %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(mean)</code></pre>
+<pre><code>##   (Intercept)       income gendermale income:gendermale
+## 1   0.6617445 4.774222e-05  0.9542181      7.169623e-05</code></pre>
+<pre class="r"><code>#bootstrapped p-values
+linear_sample2 &lt;- replicate(5000, {
+  linear_boot &lt;- ad[sample(nrow(ad), replace=TRUE),]
+  linear &lt;- lm(daily_site_time ~ income*gender, data = linear_boot)
+  pvalue &lt;- coeftest(linear)[,4] 
+})
+
+linear_sample2 %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(mean)</code></pre>
+<pre><code>##   (Intercept)       income gendermale income:gendermale
+## 1    0.473678 5.420809e-09    0.43818         0.5359227</code></pre>
+<p>The values of the bootstrapped standard errors for each coefficient estimate do not differ very much from the non-bootstrapped standard errors. The p-values for these bootstrapped coefficient estimates are also relatively similar to the non-bootstrapped estimates; the bootstrapped p-value for the ‘income’ coefficient is larger than the non-bootstrapped p-value, though it is still significant. The bootstrapped p-values for the ‘gender’ variable and the interaction between ‘gender’ and ‘income’ are both insignificant.</p>
+</div>
+<div id="logisitic-regression-model" class="section level3">
+<h3>Logisitic Regression Model</h3>
+<pre class="r"><code>#logisitic regression model
+logistic_fit &lt;- glm(clicked ~ income+age, data=ad, family=&quot;binomial&quot;)
+summary(logistic_fit)</code></pre>
+<pre><code>##
+## Call:
+## glm(formula = clicked ~ income + age, family =
+&quot;binomial&quot;, data = ad)
+##
+## Deviance Residuals:
+## Min 1Q Median 3Q Max
+## -3.2167 -0.7125 -0.1286 0.6214 2.4354
+##
+## Coefficients:
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 2.670e-01 9.002e-02 2.966 0.00302 **
+## income -1.033e-04 8.207e-06 -12.586 &lt; 2e-16 ***
+## age 1.626e-01 1.261e-02 12.901 &lt; 2e-16 ***
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## (Dispersion parameter for binomial family taken to be 1)
+##
+## Null deviance: 1386.3 on 999 degrees of freedom
+## Residual deviance: 880.0 on 997 degrees of freedom
+## AIC: 886
+##
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>#confusion matrix
+prob &lt;- predict(logistic_fit, type = &quot;response&quot;) 
+pred &lt;- ifelse(prob &gt; 0.5, 1, 0) 
+
+table(truth = ad$clicked, prediction = pred) %&gt;% addmargins</code></pre>
+<pre><code>##      prediction
+## truth    0    1  Sum
+##   0    430   70  500
+##   1    121  379  500
+##   Sum  551  449 1000</code></pre>
+<pre class="r"><code>(430+379)/1000 #accuracy  </code></pre>
+<pre><code>## [1] 0.809</code></pre>
+<pre class="r"><code>379/449 #tpr</code></pre>
+<pre><code>## [1] 0.844098</code></pre>
+<pre class="r"><code>430/551 #tnr</code></pre>
+<pre><code>## [1] 0.7803993</code></pre>
+<pre class="r"><code>379/500 #ppv</code></pre>
+<pre><code>## [1] 0.758</code></pre>
+<pre class="r"><code>#logit density plot
+ad1 &lt;- ad
+ad1$logit &lt;- predict(logistic_fit, type = &quot;link&quot;) 
+ad1$clicked &lt;- as.factor(ad$clicked)
+
+ggplot(ad1, aes(logit, fill = clicked)) + geom_density(alpha = 0.3) + 
+  scale_fill_discrete(name = &quot;Clicked on Ad&quot;, labels = c(&quot;No&quot;, &quot;Yes&quot;))</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#ROC curve
+roc &lt;- ggplot(ad) + geom_roc(aes(d=clicked, m=prob),n.cuts=0)
+roc</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(roc)</code></pre>
+<pre><code>##   PANEL group      AUC
+## 1     1    -1 0.873676</code></pre>
+<pre class="r"><code>#10-fold cross-validation
+set.seed(123)
+
+k &lt;- 10
+ad_sample &lt;- ad[sample(nrow(ad)),]
+folds &lt;- cut(seq(1:nrow(ad)), breaks=k, labels=F)
+
+diags &lt;- NULL
+for (i in 1:k){
+  train &lt;- ad_sample[folds != i,]
+  test &lt;- ad_sample[folds == i,]
+  truth &lt;- test$clicked
+  
+  fit &lt;- glm(clicked ~ income+age, data=train, family=&quot;binomial&quot;)
+  prob &lt;- predict(fit, newdata=test, type=&quot;response&quot;)
+  
+  diags &lt;- rbind(diags,class_diag(prob,truth))
+}
+
+apply(diags, 2, mean) </code></pre>
+<pre><code>##       acc      sens       ppv 
+## 0.8070000 0.7617276 0.8396749</code></pre>
+<p>I built a logistic model predicting if a user clicked on an ad by area income, age, and daily time spent on the internet. After running this model, all coefficients were found to be significant, with p-values &lt; 0.05. For every 1 unit increase in income, the odds of a user clicking on ad decrease by <span class="math inline">\(e^{-1.03*10^{-4}}\)</span>. For every 1 unit increase in age, the odds of a user clicking on an ad increase by <span class="math inline">\(e^{0.163}\)</span>.</p>
+<p>This logistic model’s diagnostic statistics are decent. The model has an accuracy of 0.809, a sensitivity of 0.844, a specificity of 0.780, and a recall of 0.758. Thus, this model has a high proportion of correctly classified cases and accurate predictions.</p>
+<p>This model has an AUC of 0.874. This means that there is a 87.4% probability that a randomly selected person who clicked on an ad has a higher prediction value than a randomly selected person who did not click on ad.</p>
+<p>10-fold cross-validation was performed to compute this model’s out-of-sample performance. The out-of-sample accuracy is 0.807, its sensitivity is 0.762, and its recall is 0.840. Ultimately, these diagnostic statistics are similar to the model’s in-sample performance, and thus I can conclude that this model is a reliable predictor of the outcome variable.</p>
+</div>
+<div id="lasso-regression-model" class="section level3">
+<h3>LASSO Regression Model</h3>
+<pre class="r"><code>#lasso variable selection
+fit &lt;-  glm(clicked ~ -1 + income + age + daily_site_time + daily_internet_time + gender, 
+            data = ad_scale, family = &quot;binomial&quot;)
+
+x &lt;- model.matrix(fit)
+x &lt;- scale(x)
+y &lt;- as.matrix(ad_scale$clicked)
+
+cv &lt;- cv.glmnet(x, y)
+lasso &lt;- glmnet(x, y, lambda=cv$lambda.1se)
+
+coef(lasso)</code></pre>
+<pre><code>## 7 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                              s0
+## (Intercept)          0.50000000
+## income              -0.06227066
+## age                  0.05945539
+## daily_site_time     -0.18871586
+## daily_internet_time -0.22082342
+## genderfemale         .         
+## gendermale           .</code></pre>
+<pre class="r"><code>#10-fold cross-validation
+set.seed(123)
+k &lt;- 10 
+
+ad_sample &lt;- ad_scale[sample(nrow(ad_scale)),] 
+folds &lt;- cut(seq(1:nrow(ad_scale)),breaks=k,labels=F) 
+
+diags&lt;-NULL
+for(i in 1:k){
+ train &lt;- ad_sample[folds!=i,]
+ test &lt;- ad_sample[folds==i,]
+ truth &lt;- test$clicked
+
+ logistic_fit &lt;- glm(clicked ~ income+age+daily_site_time+daily_internet_time, data = train, family = &quot;binomial&quot;)
+ prob &lt;- predict(logistic_fit, newdata = test, type = &quot;response&quot;)
+
+ diags &lt;- rbind(diags, class_diag(prob,truth))
+}
+
+apply(diags, 2, mean) </code></pre>
+<pre><code>##       acc      sens       ppv 
+## 0.9670000 0.9570238 0.9775518</code></pre>
+<p>After running a Lasso regression, the variables that were retained are age, income, daily time spent on a site, and daily time spent on the internet. The gender variable was dropped. 10-fold cross-validation was performed on a new model containing only Lasso-selected variables, and it was found that this new model’s out-of-sample accuracy was greatly improved over the model in #5. This model has an accuracy of 0.967, a sensitivity of 0.957, and a recall of 0.978.</p>
+</div>

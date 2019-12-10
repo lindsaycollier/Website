@@ -1,0 +1,354 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "Lindsay Collier (lmc3746)"
+date: "November 26, 2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(sandwich)
+library(lmtest)
+library(plotROC)
+library(knitr)
+library(glmnet)
+library(vegan)
+
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]
+  truth <- truth[ord]
+ 
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1)
+  FPR<-c(0,FPR[!dup],1)
+  
+  data.frame(acc,sens,ppv)
+}
+```
+
+### Introduction
+
+For this project, I will be using a dataset that compiles characteristics of individual web users who did or did not click on an ad. This dataset, *ad*, contains the binary response variable 'clicked on ad,' quantified as either a 0 (did not click) or a 1 (did click). The dataset additionally includes the following variables: daily time spent on the website (in minutes), daily internet usage (in minutes), age, area income ($), and gender. 
+
+```{R, echo=FALSE}
+
+advertising <- read.csv("C:/Users/linds/Documents/_SDS 348 Computational Biology/Project 2/advertising.csv")
+ad <- advertising %>% select(-City, -Country, -Timestamp, -Ad.Topic.Line)
+
+ad <- ad %>% transmute(income = Area.Income, age = Age,
+                    daily_site_time = Daily.Time.Spent.on.Site,
+                    daily_internet_time = Daily.Internet.Usage,
+                    male = Male, clicked = Clicked.on.Ad)
+
+ad <- ad %>% mutate(gender=case_when(male == 1 ~ "male", male == 0 ~ "female" )) %>% 
+  select(-male)
+
+ad_scale <- ad %>% transmute(income=scale(income), daily_site_time=scale(daily_site_time),
+                             age=scale(age), daily_internet_time=scale(daily_internet_time),
+                             gender=gender, clicked=clicked)
+
+ad %>% select(clicked,gender,age,income,daily_site_time,daily_internet_time) %>% head %>% kable
+```
+
+### Testing Variables
+
+```{R}
+#MANOVA
+manova <- manova(cbind(daily_site_time,age,income,daily_internet_time)~clicked, data = ad)
+
+summary(manova)
+
+#univariate ANOVAs
+summary.aov(manova)
+
+#post-hoc t-tests
+pairwise.t.test(ad$daily_site_time, ad$clicked, p.adj="none")
+
+pairwise.t.test(ad$age, ad$clicked, p.adj="none")
+
+pairwise.t.test(ad$income, ad$clicked, p.adj="none")
+
+pairwise.t.test(ad$daily_internet_time, ad$clicked, p.adj="none")
+
+#type I error
+1-(1-0.05)^9
+
+#checking assumption: multivariate normality (using scaled version of dataset)
+ggplot(ad_scale, aes(x = daily_site_time, y = age)) +
+ geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~clicked)
+
+ggplot(ad_scale, aes(x = daily_site_time, y = daily_internet_time)) +
+ geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~clicked)
+
+ggplot(ad_scale, aes(x = daily_site_time, y = income)) +
+ geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~clicked)
+
+#checking assumption: homogenous covariances (using scaled version of dataset)
+covmats <- ad_scale %>% group_by(clicked) %>% do(covs=cov(.[1:4]))
+for(i in 1:2){print(covmats$covs[i])}
+
+```
+
+The results of the MANOVA show that there are significant differences in the four dependent measures (daily time spent on site, daily internet usage, area income, and age) across the two levels of the "clicked on ad" variable, with a p-value <0.05. 
+
+Univariate ANOVAs were performed on each of the four dependent variables. All four responses showed significant mean differences across the two groups of the "clicked on ad" variable, with a p-value <0.05. Post hoc analysis of these four variables was consistent with the univariate ANOVAs, in that each response variable was shown to significantly differ across the binary groups (0 or 1) of the "clicked on ad" variable.
+
+For this analysis, 9 tests were performed (1 MANOVA, 4 ANOVAs, and 4 t-tests). The probability of type I error is 36.98%. The Bonferroni correction is thus 0.05/9 = 0.0056. Even after incorporating this Bonferroni adjustment, each numeric variable differs significantly across the two levels of the "clicked on ad" variable.
+
+There is relative multivariate normality among the response variables, and there seems to be homogenous covariances among the groups.
+
+
+### Randomization Test
+
+```{R}
+#compute observed F
+distances <- ad %>% select(daily_site_time,age,income,daily_internet_time) %>% dist()
+
+SST <- sum(distances^2)/1000 
+SSW <- ad %>% group_by(clicked) %>% select(daily_site_time,age,income,daily_internet_time) %>% 
+  do(d = dist(.[2:5], "euclidean")) %>% ungroup() %>% 
+  summarize(sum(d[[1]]^2)/500 + sum(d[[2]]^2)/500) %>% pull 
+
+F_obs <- ((SST-SSW)/1)/(SSW/998)
+
+# compute null distribution for F
+Fs <- replicate(1000,{
+new <- ad %>% mutate(clicked=sample(clicked)) #permute the species vector
+SSW <- new %>% group_by(clicked) %>% select(daily_site_time,age,income,daily_internet_time) %>% 
+  do(d=dist(.[2:5], "euclidean")) %>% ungroup() %>% 
+  summarize(sum(d[[1]]^2)/500 + sum(d[[2]]^2)/500) %>% pull
+
+((SST-SSW)/1)/(SSW/998) 
+})
+
+#histogram of null distribution
+hist(Fs,prob=T)
+
+#histogram that visualizes observed F
+hist(Fs,prob = T,breaks=seq(0, 300, by=5), xlim=c(0,300), xaxt="n")
+axis(1, at=c(0,300), labels=c("",""), lwd.ticks=0)
+axis(1, at=seq(0 , 300, by=5), lwd=0, lwd.ticks=1)
+abline(v=F_obs, col="red", add=T) 
+
+#confirming results
+adonis(distances ~ clicked, data = ad)
+```
+
+I performed a randomization MANOVA test on this data and tested the following null hypothesis:
+
+H~0~: Whether a user clicked on an ad does not vary by age, income, daily time spent on a site, and daily time spent on the internet.
+
+H~A~: Whether a user clicked on an ad does vary by age, income, daily time spent on a site, and daily time spent on the internet.
+
+The observed F-value is significantly larger than the null distribution. As such, I can conclude that the response variable ('clicked') varies significantly by the descriptive variables analyzed here (age, income, daily time spent on a site, and daily time spent on the internet).
+
+I confirmed these results with adonis().
+
+
+### Linear Regression Model
+
+```{R}
+#mean-centering numeric variables 
+ad <- ad %>% mutate(income = scale(income, scale=FALSE), age = scale(age, scale=FALSE),
+                    daily_site_time = scale(daily_site_time, scale=FALSE), 
+                    daily_internet_time = scale(daily_internet_time, scale=FALSE))
+
+#linear regression model
+linear <- lm(daily_site_time ~ income*gender, data = ad)
+summary(linear)
+
+ggplot(ad, aes(x=income, y=daily_site_time, color=gender)) + geom_point() + 
+  geom_smooth(method = "lm") + ylab("Daily Time Spent on Site") + xlab("Income")
+
+#checking assumptions: homoskedasticity
+bptest(linear) 
+
+#checking assumptions: linearity
+residuals<-linear$residuals
+fitted_values<-linear$fitted.values
+ggplot()+geom_point(aes(fitted_values,residuals))+geom_hline(yintercept=0, color='red') 
+
+#checking assumptions: normality
+qqnorm(ad$daily_site_time, pch = 1, frame = FALSE) 
+qqline(ad$daily_site_time, col = "red", lwd = 2)
+
+#robust standard errors
+coeftest(linear, vcov = vcovHC(linear)) 
+
+```
+
+I built a linear model predicting daily time spent on a site by area income and gender. After running the linear model, the coefficient estimate for the income variable, $\beta_1$, is $3.6*10^{-4}$, the coefficient estimate for the gender variable, $\beta_2$, is -1.27, and the coefficient estimate for the interaction between income and gender, $\beta_3$, is $1.2*10^{-5}$.
+
+For males, for each unit increase in income, the average daily time spent on a site increases by $\beta_1$+$\beta_3$ = $3.72*10^{-4}$. For females, for each unit increase in income, the average daily time spent on a site increases by $3.6*10^{-4}$. Additionally, males' average daily time spent on a site is 1.27 units less than females'.
+
+To test the homoskedasticity assumption, I performed a Breusch-Pagan test, and computed a p-value < 0.05. Thus, the null hypothesis of homoskedasticity is rejected, and the data is heteroskedastic. To test the linearity assumption, I plotted the fitted values against the residuals, and concluded that the data was not scattered randomly arround the mean, and thus the data is not linear. Finally, to test the normality assumption, I plotted a qq-plot and concluded that the data is not normally distributed.
+
+After re-running the regression results with robust standard errors, the significance of the analyzed variables did not change. The income variable was found to have a significant positive relationship with daily time spent on a site. Gender and the interaction between gender and income were not found to be significant. The proportion of variation in the outcome explained by this linear model is 9.7%.
+
+
+### Linear Regression Model with Bootstrapped Standard Errors
+
+```{R}
+#bootstrapped standard errors
+linear_sample1 <- replicate(5000, {
+  linear_boot <- ad[sample(nrow(ad), replace=TRUE),]
+  linear <- lm(daily_site_time ~ income*gender, data = linear_boot)
+  coeftest(linear)[,2] 
+})
+
+linear_sample1 %>% t %>% as.data.frame %>% summarize_all(mean)
+
+#bootstrapped p-values
+linear_sample2 <- replicate(5000, {
+  linear_boot <- ad[sample(nrow(ad), replace=TRUE),]
+  linear <- lm(daily_site_time ~ income*gender, data = linear_boot)
+  pvalue <- coeftest(linear)[,4] 
+})
+
+linear_sample2 %>% t %>% as.data.frame %>% summarize_all(mean)
+
+```
+
+The values of the bootstrapped standard errors for each coefficient estimate do not differ very much from the non-bootstrapped standard errors. The p-values for these bootstrapped coefficient estimates are also relatively similar to the non-bootstrapped estimates; the bootstrapped p-value for the 'income' coefficient is larger than the non-bootstrapped p-value, though it is still significant. The bootstrapped p-values for the 'gender' variable and the interaction between 'gender' and 'income' are both insignificant.
+
+
+### Logisitic Regression Model
+
+```{R}
+#logisitic regression model
+logistic_fit <- glm(clicked ~ income+age, data=ad, family="binomial")
+summary(logistic_fit)
+
+#confusion matrix
+prob <- predict(logistic_fit, type = "response") 
+pred <- ifelse(prob > 0.5, 1, 0) 
+
+table(truth = ad$clicked, prediction = pred) %>% addmargins
+
+(430+379)/1000 #accuracy  
+379/449 #tpr
+430/551 #tnr
+379/500 #ppv
+
+#logit density plot
+ad1 <- ad
+ad1$logit <- predict(logistic_fit, type = "link") 
+ad1$clicked <- as.factor(ad$clicked)
+
+ggplot(ad1, aes(logit, fill = clicked)) + geom_density(alpha = 0.3) + 
+  scale_fill_discrete(name = "Clicked on Ad", labels = c("No", "Yes"))
+
+#ROC curve
+roc <- ggplot(ad) + geom_roc(aes(d=clicked, m=prob),n.cuts=0)
+roc
+
+calc_auc(roc)
+
+#10-fold cross-validation
+set.seed(123)
+
+k <- 10
+ad_sample <- ad[sample(nrow(ad)),]
+folds <- cut(seq(1:nrow(ad)), breaks=k, labels=F)
+
+diags <- NULL
+for (i in 1:k){
+  train <- ad_sample[folds != i,]
+  test <- ad_sample[folds == i,]
+  truth <- test$clicked
+  
+  fit <- glm(clicked ~ income+age, data=train, family="binomial")
+  prob <- predict(fit, newdata=test, type="response")
+  
+  diags <- rbind(diags,class_diag(prob,truth))
+}
+
+apply(diags, 2, mean) 
+
+```
+
+I built a logistic model predicting if a user clicked on an ad by area income, age, and daily time spent on the internet. After running this model, all coefficients were found to be significant, with p-values < 0.05. For every 1 unit increase in income, the odds of a user clicking on ad decrease by $e^{-1.03*10^{-4}}$. For every 1 unit increase in age, the odds of a user clicking on an ad increase by $e^{0.163}$. 
+
+This logistic model's diagnostic statistics are decent. The model has an accuracy of 0.809, a sensitivity of 0.844, a specificity of 0.780, and a recall of 0.758. Thus, this model has a high proportion of correctly classified cases and accurate predictions.
+
+This model has an AUC of 0.874. This means that there is a 87.4% probability that a randomly selected person who clicked on an ad has a higher prediction value than a randomly selected person who did not click on ad.
+
+10-fold cross-validation was performed to compute this model's out-of-sample performance. The out-of-sample accuracy is 0.807, its sensitivity is 0.762, and its recall is 0.840. Ultimately, these diagnostic statistics are similar to the model's in-sample performance, and thus I can conclude that this model is a reliable predictor of the outcome variable.
+
+
+### LASSO Regression Model
+
+```{R}
+#lasso variable selection
+fit <-  glm(clicked ~ -1 + income + age + daily_site_time + daily_internet_time + gender, 
+            data = ad_scale, family = "binomial")
+
+x <- model.matrix(fit)
+x <- scale(x)
+y <- as.matrix(ad_scale$clicked)
+
+cv <- cv.glmnet(x, y)
+lasso <- glmnet(x, y, lambda=cv$lambda.1se)
+
+coef(lasso)
+
+#10-fold cross-validation
+set.seed(123)
+k <- 10 
+
+ad_sample <- ad_scale[sample(nrow(ad_scale)),] 
+folds <- cut(seq(1:nrow(ad_scale)),breaks=k,labels=F) 
+
+diags<-NULL
+for(i in 1:k){
+ train <- ad_sample[folds!=i,]
+ test <- ad_sample[folds==i,]
+ truth <- test$clicked
+
+ logistic_fit <- glm(clicked ~ income+age+daily_site_time+daily_internet_time, data = train, family = "binomial")
+ prob <- predict(logistic_fit, newdata = test, type = "response")
+
+ diags <- rbind(diags, class_diag(prob,truth))
+}
+
+apply(diags, 2, mean) 
+```
+
+After running a Lasso regression, the variables that were retained are age, income, daily time spent on a site, and daily time spent on the internet. The gender variable was dropped. 10-fold cross-validation was performed on a new model containing only Lasso-selected variables, and it was found that this new model's out-of-sample accuracy was greatly improved over the model in #5. This model has an accuracy of 0.967, a sensitivity of 0.957, and a recall of 0.978.
+
+
+
+

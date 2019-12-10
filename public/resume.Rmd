@@ -1,0 +1,78 @@
+---
+title: "Lindsay Collier"
+author: "Lindsay Collier"
+output:
+  theme: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<center> [Email](mailto:lindsay.collier@utexas.edu) | [LinkedIn](linkedin.com/in/lindsay-collier) </center>
+
+
+<center> <h3>Education</h3> </center>
+
+**Bachelor of Science in Cellular and Molecular Biology**
+
+**Certificate in Applied Statistical Modeling**
+
+The University of Texas at Austin @ Austin, TX -- September 2016 to May 2020
+
+
+<center> <h3>Skills</h3> </center>
+
+**Molecular Biology**: Next Generation Sequencing, PCR and qPCR, DNA isolation, agarose and polyacrylamide gel electrophoresis, molecular cloning, bacterial cell transformation, protein purification, western blots, microscopy
+
+**Microbiology**: Cell culturing, agar plate and broth inoculation, colony isolation
+
+**Computer/Technical**: R, Microsoft Office (Word, Excel, Powerpoint)
+
+<center> <h3>Experience</h3> </center>
+
+**Research Intern**
+
+_Asuragen, Austin, TX_ -- May 2019 to August 2019
+
+* Conducted research to assist the development of a novel NGS-based, high-sensitivity liquid biopsy diagnostic assay intended to identify mutational signatures indicative of cancer.
+
+* Successfully utilized molecular biology techniques to achieve experimental goals, including tissue-based DNA isolation, qPCR, gene-specific PCR, and Next Generation Sequencing. 
+
+* Compiled, analyzed, and presented complex data to the managing Senior Scientist, and collaborated with scientists to develop research goals and design experiments.
+
+* Regularly calibrated and maintained lab equipment and instruments.
+
+**Undergraduate Research Assistant**
+
+_The University of Texas at Austin, Austin, TX_ -- January 2018 to present
+
+* Supervised and provided guidance to underclassmen conducting research in “UT Microbe Hackers,” a synthetic biology lab participating in the Freshman Research Initiative (FRI).
+
+* Utilized and taught safe molecular biology and microbiology techniques to freshmen students.
+
+* Conducted a three-semester independent research project under the supervision of Dr. Dennis Mishler which combined molecular biology and microbiology research techniques to refine a bioassay based on genetically-engineered bacteria.
+
+**Undergraduate Teaching Assistant**
+
+_The University of Texas at Austin, Austin, TX_ -- September 2017 to December 2017
+
+* Assisted the course instructors in conducting the class “Scientific Inquiry Across the Disciplines” by preparing course materials, grading assignments, and supervising students in lab settings.
+
+* Provided individual instruction and guidance through peer mentoring and teaching of safe molecular biology and microbiology practices and techniques.
+
+
+**Program Instructor Intern**
+
+_Girlstart, Austin, TX_ -- September 2017 to December 2019
+
+* Led weekly after-school and summer outreach programs focused on teaching STEM concepts and encouraging interest in STEM fields among elementary-aged female students.
+
+* Responsible for preparing materials, maintaining attendance, and implementing activities.
+
+
+
+
+
+
