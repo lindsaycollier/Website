@@ -1,6 +1,6 @@
 install.packages("blogdown")
 blogdown::install_hugo()
-library(blogdown)
+
 #replace username/repo below with the user/hugo-theme you want to use!
 #I would stick with sustain for now!
 
