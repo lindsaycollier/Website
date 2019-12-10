@@ -161,7 +161,7 @@ billboard_cor_melt <- melt(upper_tri, na.rm = TRUE)
 
 ggplot(data = billboard_cor_melt, aes(Var2, Var1, fill = value)) +
   geom_tile(color = "white") + 
-  geom_text(aes(Var2, Var1, label = value), color = "black", size = 2) +
+  geom_text(aes(Var2, Var1, label = value), color = "black", size = 1.8) +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
                        midpoint = 0, limit = c(-1,1), space = "Lab", 
                        name="Correlation") +
