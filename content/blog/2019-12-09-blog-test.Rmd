@@ -8,7 +8,7 @@ tags: []
 description: ''
 ---
 
-Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data. Here, I use the infamous 'iris' dataset to demonstrate some basic data analysis functionalities of Python. 
+Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.  
 
 ```{python,include=FALSE}
 import numpy as np
@@ -22,7 +22,9 @@ iris=pd.DataFrame(data=iris.data, index=iris.target, columns=iris.feature_names)
 iris.to_csv("iris.csv")
 ```
 
-When doing data wrangling, Python's _pandas_ package is a commendable alternative for R's _tidyverse_ and _dplyr_ packages. Below, I use some basic _pandas_ functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.
+<center>![](/blog/2019-12-09-blog-test_files/python2.png){width=60% height=60%}</center>
+
+Here, I use the infamous 'iris' dataset to demonstrate some basic data analysis functionalities of Python. When doing data wrangling, Python's _pandas_ package is a commendable alternative for R's _tidyverse_ and _dplyr_ packages. Below, I use some basic _pandas_ functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.
 
 ```{python}
 #setosa
@@ -61,6 +63,7 @@ median_sepal_length = iris["sepal length (cm)"].median()
  .head(5))
 
 ```
+
 
 In addition to data wrangling, Python can also be used to visualize data, such as with the _seaborn_ package. Here, I plot four relationships found in the iris dataset.
 
