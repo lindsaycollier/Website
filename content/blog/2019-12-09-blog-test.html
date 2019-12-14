@@ -1,8 +1,8 @@
 ---
-title: Using Python to Analyze Data
+title: Using Python to Wrangle and Visualize Data
 author: Lindsay Collier
 date: '2019-12-09'
-slug: blog-test
+slug: python-data
 categories: []
 tags: []
 description: ''
@@ -10,31 +10,59 @@ description: ''
 
 
 
-<p>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.</p>
-<p>Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.</p>
-<pre class="python"><code>iris[[&quot;sepal length (cm)&quot;, &quot;petal width (cm)&quot;]]</code></pre>
-<pre><code>##     sepal length (cm)  petal width (cm)
-## 0                 5.1               0.2
-## 0                 4.9               0.2
-## 0                 4.7               0.2
-## 0                 4.6               0.2
-## 0                 5.0               0.2
-## ..                ...               ...
-## 2                 6.7               2.3
-## 2                 6.3               1.9
-## 2                 6.5               2.0
-## 2                 6.2               2.3
-## 2                 5.9               1.8
-## 
-## [150 rows x 2 columns]</code></pre>
-<pre class="python"><code>median_sepal_length = iris[&quot;sepal length (cm)&quot;].median()
-iris[iris[&quot;sepal length (cm)&quot;] &gt;= median_sepal_length].var()</code></pre>
-<pre><code>## sepal length (cm)    0.282416
-## sepal width (cm)     0.112379
-## petal length (cm)    0.694064
-## petal width (cm)     0.185369
-## dtype: float64</code></pre>
-<pre class="r"><code>code code code
-use this to put code for plots then insert images manually
+<p>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data. Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.</p>
+<p>When doing data wrangling, Python’s <em>pandas</em> package is a commendable alternative for R’s <em>tidyverse</em> and <em>dplyr</em> packages. Below, I use some basic <em>pandas</em> functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.</p>
+<pre class="python"><code>#setosa
+(iris.loc[0,]
+.filter([&#39;sepal length (cm)&#39;,&#39;sepal width (cm)&#39;,&#39;petal length (cm)&#39;,&#39;petal width (cm)&#39;])
+.agg([&#39;mean&#39;,&#39;std&#39;]))</code></pre>
+<pre><code>##       sepal length (cm)  sepal width (cm)  petal length (cm)  petal width (cm)
+## mean            5.00600          3.428000           1.462000          0.246000
+## std             0.35249          0.379064           0.173664          0.105386</code></pre>
+<pre class="python"><code>#versicolor
+(iris.loc[1,]
+.filter([&#39;sepal length (cm)&#39;,&#39;sepal width (cm)&#39;,&#39;petal length (cm)&#39;,&#39;petal width (cm)&#39;])
+.agg([&#39;mean&#39;,&#39;std&#39;]))</code></pre>
+<pre><code>##       sepal length (cm)  sepal width (cm)  petal length (cm)  petal width (cm)
+## mean           5.936000          2.770000           4.260000          1.326000
+## std            0.516171          0.313798           0.469911          0.197753</code></pre>
+<pre class="python"><code>#virginica
+(iris.loc[2,]
+.filter([&#39;sepal length (cm)&#39;,&#39;sepal width (cm)&#39;,&#39;petal length (cm)&#39;,&#39;petal width (cm)&#39;])
+.agg([&#39;mean&#39;,&#39;std&#39;]))
+</code></pre>
+<pre><code>##       sepal length (cm)  sepal width (cm)  petal length (cm)  petal width (cm)
+## mean            6.58800          2.974000           5.552000           2.02600
+## std             0.63588          0.322497           0.551895           0.27465</code></pre>
+<p>Here, I return, in descending order, 5 ‘versicolor’ observations with a sepal length greater than or equal to the median.</p>
+<pre class="python"><code>
+median_sepal_length = iris[&quot;sepal length (cm)&quot;].median()
 
-(sns.regplot(data=iris,x=&#39;sepal length (cm)&#39;,y=&#39;petal length (cm)&#39;))</code></pre>
+(iris[iris[&quot;sepal length (cm)&quot;] &gt;= median_sepal_length]
+ .loc[1,]
+ .filter([&#39;sepal length (cm)&#39;])
+ .sort_values(by=&#39;sepal length (cm)&#39;,ascending=False)
+ .head(5))</code></pre>
+<pre><code>##    sepal length (cm)
+## 1                7.0
+## 1                6.9
+## 1                6.8
+## 1                6.7
+## 1                6.7</code></pre>
+<p>In addition to data wrangling, Python can also be used to visualize data, such as with the <em>seaborn</em> package. Here, I plot four relationships found in the iris dataset.</p>
+<pre class="r"><code>sns.regplot(data=iris,x=&#39;sepal length (cm)&#39;,y=&#39;petal length (cm)&#39;)</code></pre>
+<center>
+<img src="/blog/2019-12-09-blog-test_files/sepal_length_petal_length.JPG" style="width:90.0%" style="height:90.0%" />
+</center>
+<pre class="r"><code>sns.regplot(data=iris,x=&#39;sepal length (cm)&#39;,y=&#39;sepal width (cm)&#39;)</code></pre>
+<center>
+<img src="/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.JPG" style="width:90.0%" style="height:90.0%" />
+</center>
+<pre class="r"><code>sns.regplot(data=iris,x=&#39;petal length (cm)&#39;,y=&#39;petal width (cm)&#39;)</code></pre>
+<center>
+<img src="/blog/2019-12-09-blog-test_files/petal_length_petal_width.JPG" style="width:90.0%" style="height:90.0%" />
+</center>
+<pre class="r"><code>sns.regplot(data=iris,x=&#39;petal length (cm)&#39;,y=&#39;sepal width (cm)&#39;)</code></pre>
+<center>
+<img src="/blog/2019-12-09-blog-test_files/petal_length_sepal_width.JPG" style="width:90.0%" style="height:90.0%" />
+</center>

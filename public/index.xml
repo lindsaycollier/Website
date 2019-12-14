@@ -12,14 +12,13 @@
     
     
     <item>
-      <title>Using Python to Analyze Data</title>
-      <link>/blog/blog-test/</link>
+      <title>Using Python to Wrangle and Visualize Data</title>
+      <link>/blog/python-data/</link>
       <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
       
-      <guid>/blog/blog-test/</guid>
-      <description>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.
-Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.
-iris[[&amp;quot;sepal length (cm)&amp;quot;, &amp;quot;petal width (cm)&amp;quot;]]## sepal length (cm) petal width (cm)## 0 5.1 0.2## 0 4.9 0.2## 0 4.7 0.2## 0 4.6 0.2## 0 5.0 0.2## .</description>
+      <guid>/blog/python-data/</guid>
+      <description>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data. Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.
+When doing data wrangling, Python’s pandas package is a commendable alternative for R’s tidyverse and dplyr packages. Below, I use some basic pandas functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.</description>
     </item>
     
     <item>
