@@ -18,7 +18,8 @@
       
       <guid>/blog/python-data/</guid>
       <description>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.
-Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python. When doing data wrangling, Python’s pandas package is a commendable alternative for R’s tidyverse and dplyr packages. Below, I use some basic pandas functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.</description>
+Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.
+When doing data wrangling, Python’s pandas package is a commendable alternative for R’s tidyverse and dplyr packages. Below, I use some basic pandas functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.</description>
     </item>
     
   </channel>

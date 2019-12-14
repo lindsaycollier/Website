@@ -24,7 +24,9 @@ iris.to_csv("iris.csv")
 
 <center>![](/blog/2019-12-09-blog-test_files/python2.png){width=60% height=60%}</center>
 
-Here, I use the infamous 'iris' dataset to demonstrate some basic data analysis functionalities of Python. When doing data wrangling, Python's _pandas_ package is a commendable alternative for R's _tidyverse_ and _dplyr_ packages. Below, I use some basic _pandas_ functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.
+Here, I use the infamous 'iris' dataset to demonstrate some basic data analysis functionalities of Python. 
+
+When doing data wrangling, Python's _pandas_ package is a commendable alternative for R's _tidyverse_ and _dplyr_ packages. Below, I use some basic _pandas_ functions to determine the mean and standard deviation for the sepal and petal width and length of each iris species.
 
 ```{python}
 #setosa
@@ -71,25 +73,27 @@ In addition to data wrangling, Python can also be used to visualize data, such a
 sns.regplot(data=iris,x='sepal length (cm)',y='petal length (cm)')
 ```
 
-<center>![](/blog/2019-12-09-blog-test_files/sepal_length_petal_length.JPG){width=90% height=90%}</center>
+<center>![](/blog/2019-12-09-blog-test_files/sepal_length_petal_length.JPG){width=70% height=70%}</center>
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='sepal length (cm)',y='sepal width (cm)')
 ```
 
-<center>![](/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.JPG){width=90% height=90%}</center>
+<center>![](/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.JPG){width=70% height=70%}</center>
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='petal length (cm)',y='petal width (cm)')
 ```
 
-<center>![](/blog/2019-12-09-blog-test_files/petal_length_petal_width.JPG){width=90% height=90%}</center>
+<center>![](/blog/2019-12-09-blog-test_files/petal_length_petal_width.JPG){width=70% height=70%}</center>
 
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='petal length (cm)',y='sepal width (cm)')
 ```
 
-<center> ![](/blog/2019-12-09-blog-test_files/petal_length_sepal_width.JPG){width=90% height=90%} </center>
+<center> ![](/blog/2019-12-09-blog-test_files/petal_length_sepal_width.JPG){width=70% height=70%} </center>
 
+All in all, Python
 
+![](/blog/2019-12-09-blog-test_files/image.png)
