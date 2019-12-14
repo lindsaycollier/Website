@@ -1,5 +1,5 @@
 ---
-title: Blog Test
+title: Using Python to Analyze Data
 author: Lindsay Collier
 date: '2019-12-09'
 slug: blog-test
@@ -8,4 +8,32 @@ tags: []
 description: ''
 ---
 
-This is a test blog post
+Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.
+
+Here, I use the infamous 'iris' dataset to demonstrate some basic data analysis functionalities of Python. 
+
+```{python,include=FALSE}
+import numpy as np
+import pandas as pd
+from sklearn import datasets
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+iris = datasets.load_iris()
+iris=pd.DataFrame(data=iris.data, index=iris.target, columns=iris.feature_names)
+iris.to_csv("iris.csv")
+```
+
+```{python}
+iris[["sepal length (cm)", "petal width (cm)"]]
+median_sepal_length = iris["sepal length (cm)"].median()
+iris[iris["sepal length (cm)"] >= median_sepal_length].var()
+
+```
+
+```{R,eval = FALSE}
+code code code
+use this to put code for plots then insert images manually
+
+(sns.regplot(data=iris,x='sepal length (cm)',y='petal length (cm)'))
+```

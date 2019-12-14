@@ -3,12 +3,12 @@ title: "Projects"
 output: html_notebook
 ---
 
-_In these projects, I utilized R and various R packages (ggplot, tidyverse, dplyr) to perform data analysis and build predictive models._
+_In these projects, I utilized R and various R packages (including, but not limited to, ggplot, tidyverse, and dplyr) to perform data analysis and build predictive models._
 <br></br>
 
 <center>[Project 1](/Project1/)</center>
 
-This project is an exploratory data analysis of 55 years' worth of Billboard Top 100 songs. I used R's tidyverse and ggplot packages to organize and visualize the data. By combining the Billboard Top 100 charts with song metrics sourced from Spotify, I strove to discover what makes a song 'popular,' and how music preferences have changed over the past half century.
+This project is an exploratory data analysis of 55 years' worth of Billboard Top 100 songs. I used R's tidyverse and ggplot packages to organize and visualize the data, and performed Principal Component Analysis to discover patterns among the most popular songs from 1960 to 2015. By combining the Billboard Top 100 charts with song metrics sourced from Spotify, I strove to discover what makes a song 'popular,' and how music preferences have changed over the past half century.
 <br></br>
 <center>[Project 2](/Project2/)</center>
 

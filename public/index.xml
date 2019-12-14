@@ -12,21 +12,14 @@
     
     
     <item>
-      <title>Blog Test</title>
+      <title>Using Python to Analyze Data</title>
       <link>/blog/blog-test/</link>
       <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>/blog/blog-test/</guid>
-      <description>This is a test blog post</description>
-    </item>
-    
-    <item>
-      <title>Test Python</title>
-      <link>/blog/test-python/</link>
-      <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/blog/test-python/</guid>
-      <description>This is a test blog post</description>
+      <description>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.
+Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.
+iris[[&amp;quot;sepal length (cm)&amp;quot;, &amp;quot;petal width (cm)&amp;quot;]]## sepal length (cm) petal width (cm)## 0 5.1 0.2## 0 4.9 0.2## 0 4.7 0.2## 0 4.6 0.2## 0 5.0 0.2## .</description>
     </item>
     
     <item>
@@ -87,8 +80,8 @@ To conduct this analysis, I am using two datasets that list unique musical chara
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/projects/</guid>
-      <description>In these projects, I utilized R and various R packages (ggplot, tidyverse, dplyr) to perform data analysis and build predictive models. 
-Project 1This project is an exploratory data analysis of 55 years’ worth of Billboard Top 100 songs. I used R’s tidyverse and ggplot packages to organize and visualize the data. By combining the Billboard Top 100 charts with song metrics sourced from Spotify, I strove to discover what makes a song ‘popular,’ and how music preferences have changed over the past half century.</description>
+      <description>In these projects, I utilized R and various R packages (including, but not limited to, ggplot, tidyverse, and dplyr) to perform data analysis and build predictive models. 
+Project 1This project is an exploratory data analysis of 55 years’ worth of Billboard Top 100 songs. I used R’s tidyverse and ggplot packages to organize and visualize the data, and performed Principal Component Analysis to discover patterns among the most popular songs from 1960 to 2015.</description>
     </item>
     
   </channel>

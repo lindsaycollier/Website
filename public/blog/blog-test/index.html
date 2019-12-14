@@ -7,7 +7,7 @@
     <meta name="author" content="Lindsay Collier" />
     <meta name="description" content="Describe your website">
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-    <title>Blog Test</title>
+    <title>Using Python to Analyze Data</title>
     <meta name="generator" content="Hugo 0.60.1" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
@@ -56,7 +56,7 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="/blog/blog-test/">Blog Test</a></strong>
+            <strong><a href="/blog/blog-test/">Using Python to Analyze Data</a></strong>
           </h3>
         </div>
         <div class="blog-title">
@@ -67,7 +67,34 @@
               
 
 
-<p>This is a test blog post</p>
+<p>Though I am most familiar with R, Python is another language that is quite useful when organizing and analyzing data.</p>
+<p>Here, I use the infamous ‘iris’ dataset to demonstrate some basic data analysis functionalities of Python.</p>
+<pre class="python"><code>iris[[&quot;sepal length (cm)&quot;, &quot;petal width (cm)&quot;]]</code></pre>
+<pre><code>##     sepal length (cm)  petal width (cm)
+## 0                 5.1               0.2
+## 0                 4.9               0.2
+## 0                 4.7               0.2
+## 0                 4.6               0.2
+## 0                 5.0               0.2
+## ..                ...               ...
+## 2                 6.7               2.3
+## 2                 6.3               1.9
+## 2                 6.5               2.0
+## 2                 6.2               2.3
+## 2                 5.9               1.8
+## 
+## [150 rows x 2 columns]</code></pre>
+<pre class="python"><code>median_sepal_length = iris[&quot;sepal length (cm)&quot;].median()
+iris[iris[&quot;sepal length (cm)&quot;] &gt;= median_sepal_length].var()</code></pre>
+<pre><code>## sepal length (cm)    0.282416
+## sepal width (cm)     0.112379
+## petal length (cm)    0.694064
+## petal width (cm)     0.185369
+## dtype: float64</code></pre>
+<pre class="r"><code>code code code
+use this to put code for plots then insert images manually
+
+(sns.regplot(data=iris,x=&#39;sepal length (cm)&#39;,y=&#39;petal length (cm)&#39;))</code></pre>
 
               <hr>
               <div class="related-posts">
