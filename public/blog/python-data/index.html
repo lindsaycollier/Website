@@ -95,6 +95,7 @@
 <pre><code>##       sepal length (cm)  sepal width (cm)  petal length (cm)  petal width (cm)
 ## mean            6.58800          2.974000           5.552000           2.02600
 ## std             0.63588          0.322497           0.551895           0.27465</code></pre>
+<p><br></br></p>
 <p>Here, I return, in descending order, 5 ‘versicolor’ observations with a sepal length greater than or equal to the median.</p>
 <pre class="python"><code>
 median_sepal_length = iris[&quot;sepal length (cm)&quot;].median()
@@ -110,28 +111,27 @@ median_sepal_length = iris[&quot;sepal length (cm)&quot;].median()
 ## 1                6.8
 ## 1                6.7
 ## 1                6.7</code></pre>
-<p>In addition to data wrangling, Python can also be used to visualize data, such as with the <em>seaborn</em> package. Here, I plot four relationships found in the iris dataset.</p>
+<p><br></br></p>
+<p>In addition to data wrangling, Python can also be used to visualize data, such as with the <em>matplotlib</em> and <em>seaborn</em> packages. These packages output clean, easy-to-interpret graphs from a given dataset.</p>
+<p>Here, I use <em>seaborn</em> to make scatterplots visualizing four relationships found in the iris dataset.</p>
 <pre class="r"><code>sns.regplot(data=iris,x=&#39;sepal length (cm)&#39;,y=&#39;petal length (cm)&#39;)</code></pre>
 <center>
-<img src="/blog/2019-12-09-blog-test_files/sepal_length_petal_length.JPG" style="width:70.0%" style="height:70.0%" />
+<img src="/blog/2019-12-09-blog-test_files/sepal_length_petal_length.png" />
 </center>
 <pre class="r"><code>sns.regplot(data=iris,x=&#39;sepal length (cm)&#39;,y=&#39;sepal width (cm)&#39;)</code></pre>
 <center>
-<img src="/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.JPG" style="width:70.0%" style="height:70.0%" />
+<img src="/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.png" />
 </center>
 <pre class="r"><code>sns.regplot(data=iris,x=&#39;petal length (cm)&#39;,y=&#39;petal width (cm)&#39;)</code></pre>
 <center>
-<img src="/blog/2019-12-09-blog-test_files/petal_length_petal_width.JPG" style="width:70.0%" style="height:70.0%" />
+<img src="/blog/2019-12-09-blog-test_files/petal_length_petal_width2.png" />
 </center>
 <pre class="r"><code>sns.regplot(data=iris,x=&#39;petal length (cm)&#39;,y=&#39;sepal width (cm)&#39;)</code></pre>
 <center>
-<img src="/blog/2019-12-09-blog-test_files/petal_length_sepal_width.JPG" style="width:70.0%" style="height:70.0%" />
-</center>
-<p>All in all, Python</p>
-<div class="figure">
 <img src="/blog/2019-12-09-blog-test_files/image.png" />
-
-</div>
+</center>
+<p><br></br></p>
+<p>All in all, Python (and its assorted packages) is a great alternative to R for data wrangling and visualization.</p>
 
               <hr>
               <div class="related-posts">

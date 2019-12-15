@@ -51,6 +51,7 @@ When doing data wrangling, Python's _pandas_ package is a commendable alternativ
 
 
 ```
+<br></br>
 
 Here, I return, in descending order, 5 'versicolor' observations with a sepal length greater than or equal to the median.
 
@@ -65,35 +66,38 @@ median_sepal_length = iris["sepal length (cm)"].median()
  .head(5))
 
 ```
+<br></br>
 
+In addition to data wrangling, Python can also be used to visualize data, such as with the _matplotlib_ and _seaborn_ packages. These packages output clean, easy-to-interpret graphs from a given dataset.
 
-In addition to data wrangling, Python can also be used to visualize data, such as with the _seaborn_ package. Here, I plot four relationships found in the iris dataset.
+Here, I use _seaborn_ to make scatterplots visualizing four relationships found in the iris dataset.
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='sepal length (cm)',y='petal length (cm)')
 ```
 
-<center>![](/blog/2019-12-09-blog-test_files/sepal_length_petal_length.JPG){width=70% height=70%}</center>
+<center>![](/blog/2019-12-09-blog-test_files/sepal_length_petal_length.png)</center>
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='sepal length (cm)',y='sepal width (cm)')
 ```
 
-<center>![](/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.JPG){width=70% height=70%}</center>
+<center>![](/blog/2019-12-09-blog-test_files/sepal_length_sepal_width.png)</center>
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='petal length (cm)',y='petal width (cm)')
 ```
 
-<center>![](/blog/2019-12-09-blog-test_files/petal_length_petal_width.JPG){width=70% height=70%}</center>
+<center>![](/blog/2019-12-09-blog-test_files/petal_length_petal_width2.png)</center>
 
 
 ```{R,eval = FALSE}
 sns.regplot(data=iris,x='petal length (cm)',y='sepal width (cm)')
 ```
 
-<center> ![](/blog/2019-12-09-blog-test_files/petal_length_sepal_width.JPG){width=70% height=70%} </center>
+<center>![](/blog/2019-12-09-blog-test_files/image.png)</center>
 
-All in all, Python
+<br></br>
 
-![](/blog/2019-12-09-blog-test_files/image.png)
+All in all, Python (and its assorted packages) is a great alternative to R for data wrangling and visualization.
+
